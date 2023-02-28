@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <_name>Torus Template Generator</_name>
+  <id>org.lauj.inkscape_sliceforms_torus</id>
+
+  <dependency type="executable" location="extensions">torus.py</dependency>
+
+  <param name="tab" type="notebook">
+    <page name="options" _gui-text="Options">
+      <param name="units" _gui-text="Units" type="optiongroup">
+	<option value="mm">mm</option>
+	<option value="cm">cm</option>
+	<option value="in">in</option>
+      </param>
+
+      <param name="major_radius" type="float" precision="2"
+	     min="0.1" max="10000"
+	     _gui-text="Major radius (doughnut's radius)">40</param>
+      <param name="minor_radius" type="float" precision="2"
+	     min="0.1" max="10000"
+	     _gui-text="Minor radius (doughnut cross section radius)">17.5</param>
+      <param name="num_slices" type="int"
+	     min="1" max="1000" _gui-text="Number of slices in each direction">8</param>
+      <param name="material_thickness" type="float" precision="2"
+	     min="0.1" max="5" _gui-text="Thickness of material">.25</param>
+      <param name="material_width" type="float" precision="2"
+	     min="0.1" max="10000" _gui-text="Width of material">203</param>
+
+    </page>
+    <page name="help" _gui-text="Help">
+      <param name="help_text" type="description"
+	     xml:space="preserve">Generate sliceform torus templates.
+
+Recommended settings:
+  major radius: 40mm
+  minor radius: 17.5mm
+  slices: 8
+  material thickness: .25mm
+  </param>
+    </page>
+  </param>
+
+  <effect>
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu _name="Sliceforms" />
+    </effects-menu>
+  </effect>
+  <script>
+    <command reldir="inx" interpreter="python">torus.py</command>
+  </script>
+</inkscape-extension>

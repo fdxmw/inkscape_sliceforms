@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <_name>Cylinder Template Generator</_name>
+  <id>org.lauj.inkscape_sliceforms_cylinder</id>
+
+  <dependency type="executable" location="extensions">cylinder.py</dependency>
+
+  <param name="tab" type="notebook">
+    <page name="options" _gui-text="Options">
+      <param name="units" _gui-text="Units" type="optiongroup">
+	<option value="mm">mm</option>
+	<option value="cm">cm</option>
+	<option value="in">in</option>
+      </param>
+
+      <param name="outer_radius" type="float" precision="2"
+	     min="0.1" max="10000"
+	     _gui-text="Cylinder outer radius">30</param>
+      <param name="inner_radius" type="float" precision="2"
+	     min="0.1" max="10000"
+	     _gui-text="Cylinder inner radius">26</param>
+      <param name="height" type="float" precision="2"
+	     min="0.1" max="10000"
+	     _gui-text="Cylinder height">40</param>
+      <param name="num_slices" type="int"
+	     min="1" max="1000" _gui-text="Number of slices in each direction">14</param>
+      <param name="material_thickness" type="float" precision="2"
+	     min="0.1" max="5" _gui-text="Thickness of material">.25</param>
+      <param name="material_width" type="float" precision="2"
+	     min="0.1" max="10000" _gui-text="Width of material">203</param>
+
+    </page>
+    <page name="help" _gui-text="Help">
+      <param name="help_text" type="description"
+	     xml:space="preserve">Generate sliceform cylinder templates.
+
+Recommended settings:
+  outer radius: 35mm
+  inner radius: 26mm
+  height: 40mm
+  slices: 14
+  material thickness: .25mm
+  </param>
+    </page>
+  </param>
+
+  <effect>
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu _name="Sliceforms" />
+    </effects-menu>
+  </effect>
+  <script>
+    <command reldir="inx" interpreter="python">cylinder.py</command>
+  </script>
+</inkscape-extension>
