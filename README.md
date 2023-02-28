@@ -2,7 +2,7 @@
 
 [Inkscape](https://inkscape.org/) [extensions](https://inkscape.org/gallery/=extension/) that generate sliceform templates.
 
-![torus models](images/tori.jpg) ![cylinder models](images/cylinder.jpg)
+![torus models](images/tori.jpg) ![cylinder models](images/cylinders.jpg)
 
 This project has template generators for two models: a torus and a cylinder. Both models are based on the paper [Building a torus with Villarceau sections](http://www.heldermann-verlag.de/jgg/jgg15/j15h1mone.pdf) by María García Monera and Juan Monterde, and [sample templates](https://www.uv.es/monera2/) published by María García Monera.
 
