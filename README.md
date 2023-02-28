@@ -1,2 +1,27 @@
 # inkscape_sliceforms
-Inkscape extensions that generate sliceform templates
+
+[Inkscape](https://inkscape.org/) [extensions](https://inkscape.org/gallery/=extension/) for generating sliceform templates.
+
+This project currently has template generators for two models: a torus and a cylinder. Both models are based on the paper [Building a torus with Villarceau sections](http://www.heldermann-verlag.de/jgg/jgg15/j15h1mone.pdf) by María García Monera and Juan Monterde, and [sample templates](https://www.uv.es/monera2/) published by María García Monera.
+
+## Installation
+
+1. Install [Inkscape](https://inkscape.org/).
+2. Download this project's [latest release](https://github.com/fdxmw/inkscape_sliceforms/releases/download/r0.1/inkscape_sliceforms-installable-r0.1.zip).
+3. Unzip the release into Inkscape's "User extensions" directory. The location of this directory can be found in Inkscape's Settings, under `System > User extensions`.
+4. Restart Inkscape.
+
+If installation in successful, there should be two new menu items:
+1. `Extensions > Sliceforms > Cylinder Template Generator` 
+2. `Extensions > Sliceforms > Torus Template Generator`
+
+## Usage
+
+Run the extensions your preferred settings. The default settings should work well. Generally, models are easier to assemble when they:
+1. Are shorter in height (flatter tori, shorter cylinders),
+2. Have thinner slices (shorter distance from the left side of a slice to the right side), and
+3. Have larger central holes.
+
+Print and cut the templates. For paper I recommend using 110 lb cardstock (200 gsm), and for cutting I recommend using a machine like a Cricut or a Silhouette.
+
+To assemble the model, refer to María García Monera's videos: [torus assembly](https://www.youtube.com/watch?v=WVE-HeVFJ1k), [cylinder assembly](https://www.youtube.com/watch?v=QfBc0fR64EQ).
