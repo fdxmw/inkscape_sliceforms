@@ -10,19 +10,46 @@ def calculate_slot_width(material_thickness: float, lie_flat_angle: float):
     rigid material. Sliceforms constructed from soft materials can be
     pressed beyond lie_flat_angle.
 
-                material_thickness
+               material_thickness
               ╱━━━╱
 
             ╱   ╱  lie_flat_angle
-   ▁▁▁▁▁   ╱   ╱▁▁▁▁▁▁ ▁▁
-          ╱   ╱        ▕ material_thickness
-         ╱   ╱         ▕
-   ▔▔▔▔▔╱   ╱   ▔▔▔▔▔  ▔▔
-       ╱   ╱
+           ╱   ╱ c     ▁▁
+   ▔▔▔▔▔▔▔╱   ╱▔▔▔▔▔▔  ▕
+       d ╱   ╱         ▕ material_thickness
+        ╱   ╱          ▕
+   ▔▔▔▔╱   ╱▔▔▔▔▔▔▔▔▔  ▔▔
+      ╱   ╱
 
-       ▕━━━━━━━━▏slot_width
-
+     ▕━━━━━━━━━━━━━▏slot_width
+     ▕━━━━━━━━▕━━━━▏
+         b      c
     '''
+    # slot_width = b + c
+    # b = slot_width - c
+    #
+    # Construct a small right triangle surrounding c, with the horizontal line
+    # segment c as the hypotenuse, and the right angle at the top:
+    #
+    #   sin(lie_flat_angle) = material_thickness / c
+    #   c = material_thickness / sin(lie_flat_angle)  [Equation 0]
+    #
+    # Construct a right triangle surrounding d, with the diagonal line segment d
+    # as the hypotenuse, and the right angle in the top left:
+    #
+    #   tan(lie_flat_angle) = material_thickness / b
+    #   tan(lie_flat_angle) = material_thickness / (slot_width - c)
+    #
+    # Substitute Equation 0 and solve for slot_width:
+    #
+    #   tan(lie_flat_angle) = material_thickness /
+    #                         (slot_width - (material_thickness /
+    #                                        sin(lie_flat_angle)))
+    #   slot_width - (material_thickness /
+    #                 sin(lie_flat_angle)) = (material_thickness /
+    #                                         tan(lie_flat_angle))
+    #   slot_width = (material_thickness / tan(lie_flat_angle) +
+    #                 material_thickness / sin(lie_flat_angle))
     return (material_thickness / math.tan(lie_flat_angle) +
             material_thickness / math.sin(lie_flat_angle))
 
