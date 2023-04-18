@@ -11,21 +11,33 @@ def calculate_slot_width(material_thickness: float, lie_flat_angle: float):
     rigid material. Sliceforms constructed from soft materials can be
     pressed beyond lie_flat_angle.
 
-               material_thickness
-              ╱━━━╱
+                       ╱
+                      ╱╲ material_thickness
+                     ╱  ╲╱
+                        ╱
 
-            ╱   ╱  lie_flat_angle
-           ╱   ╱ c     ▁▁
-   ▔▔▔▔▔▔▔╱   ╱▔▔▔▔▔▔  ▕
-       d ╱   ╱         ▕ material_thickness
-        ╱   ╱          ▕
-   ▔▔▔▔╱   ╱▔▔▔▔▔▔▔▔▔  ▔▔
-      ╱   ╱
+             ▕    ╱   ╱  lie_flat_angle
+   top       ▕ b ╱c  ╱       ▁▁
+   ▔▔▔▔▔▔▔▔▔▔▔▔▔╱▔▔▔╱▔▔▔▔▔▔  ▕
+              d╱   ╱         ▕ material_thickness
+   bottom     ╱   ╱          ▕
+   ▔▔▔▔▔▔▔▔▔▔╱   ╱▔▔▔▔▔▔▔▔▔  ▔▔
+        left╱   ╱right
 
-     ▕━━━━━━━━━━━━━▏slot_width
-     ▕━━━━━━━━▕━━━━▏
-         b      c
+             ▕━━━━━━━▏slot_width
+             ▕━━▕━━━━▏
+               b   c
     '''
+    # d is the length of the diagonal line from 'top' to 'bottom', along
+    # 'left'.
+    #
+    # c is the length of the horizontal line from 'left' to 'right', along
+    # 'top'.
+    #
+    # Draw the vertical line through the intersection of 'bottom' and 'left'. b
+    # is the length of the horizontal line from this vertical line to the
+    # intersection of 'top' and 'left'.
+    #
     # slot_width = b + c
     # b = slot_width - c
     #
