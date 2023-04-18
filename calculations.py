@@ -2,6 +2,7 @@ import math
 
 from common.point import Point
 
+
 def calculate_slot_width(material_thickness: float, lie_flat_angle: float):
     '''Calculate slot width, based on thickness and desired flatness.
 
@@ -34,8 +35,8 @@ def calculate_slot_width(material_thickness: float, lie_flat_angle: float):
     #   sin(lie_flat_angle) = material_thickness / c
     #   c = material_thickness / sin(lie_flat_angle)  [Equation 0]
     #
-    # Construct a right triangle surrounding d, with the diagonal line segment d
-    # as the hypotenuse, and the right angle in the top left:
+    # Construct a right triangle surrounding d, with the diagonal line segment
+    # d as the hypotenuse, and the right angle in the top left:
     #
     #   tan(lie_flat_angle) = material_thickness / b
     #   tan(lie_flat_angle) = material_thickness / (slot_width - c)
@@ -53,6 +54,7 @@ def calculate_slot_width(material_thickness: float, lie_flat_angle: float):
     return (material_thickness / math.tan(lie_flat_angle) +
             material_thickness / math.sin(lie_flat_angle))
 
+
 def calculate_slot_angles(num_slices, loxodromic_angle):
     '''Calculate slot angles in radians.
 
@@ -60,8 +62,8 @@ def calculate_slot_angles(num_slices, loxodromic_angle):
     of the bounding box's left side.
 
     '''
-    # There are (num_slices - 1) intersections, because a slice S intersects all
-    # other slices going the other direction, except for the slice that's
+    # There are (num_slices - 1) intersections, because a slice S intersects
+    # all other slices going the other direction, except for the slice that's
     # exactly opposite S. It doesn't matter if the number of slices is even or
     # odd, there is always one slice exactly opposite S.
     angles = []
@@ -84,6 +86,7 @@ def calculate_slot_angles(num_slices, loxodromic_angle):
         else:
             adjusted_angles.append(angle)
     return adjusted_angles
+
 
 def solve_quadratic(a, b, c):
     '''Return the positive solution to a quadratic equation

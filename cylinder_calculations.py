@@ -4,6 +4,7 @@ from common.point import Point
 
 from calculations import solve_quadratic
 
+
 def loxodromic_angle(height, radius):
     '''Calculate slice intersection angle for a cylinder with (height, radius).
 
@@ -13,6 +14,7 @@ def loxodromic_angle(height, radius):
 
     '''
     return math.atan((height / 2) / radius)
+
 
 def intersect_ellipse_line(x_radius, y_radius, angle, dy) -> Point:
     '''Intersect an ellipse and a line.
@@ -61,13 +63,15 @@ def intersect_ellipse_line(x_radius, y_radius, angle, dy) -> Point:
     y = math.tan(angle) * x + dy
     return Point(x, y)
 
+
 def slot_corners(x_radius, y_radius, angle, width):
     '''Calculate slot corner coordinates.
 
     'angle' is the slot's angle, and 'width' is the slot's width.
 
-    Returns a pair of Points (P0, P1) that identify a slot's corners. The origin
-    is vertically centered between the slot's top-left and bottom-right corners.
+    Returns a pair of Points (P0, P1) that identify a slot's corners. The
+    origin is vertically centered between the slot's top-left and bottom-right
+    corners.
 
                 ▏
                 ▏P1
@@ -100,10 +104,11 @@ def slot_corners(x_radius, y_radius, angle, width):
     dy = (width / 2) / math.sin(math.pi / 2 - angle)
 
     # Intersect the slot walls with the elliptical slice edge. The upper slot
-    # wall has y-intercept dy, and the lower slot wall has y-intercept -dy. Both
-    # walls have the same angle.
+    # wall has y-intercept dy, and the lower slot wall has y-intercept
+    # -dy. Both walls have the same angle.
     return [intersect_ellipse_line(x_radius, y_radius, angle, dy),
             intersect_ellipse_line(x_radius, y_radius, angle, -dy)]
+
 
 def calculate_height(radius, loxodromic_angle):
     '''Calculate a cylinder's height from radius and loxodromic_angle.
@@ -113,11 +118,13 @@ def calculate_height(radius, loxodromic_angle):
     '''
     return math.tan(loxodromic_angle) * (radius * 2)
 
+
 def main():
     radius = 40
     height = calculate_height(radius=radius, loxodromic_angle=math.radians(35))
     print(height)
     print(math.degrees(loxodromic_angle(height=height, radius=radius)))
+
 
 if __name__ == '__main__':
     main()

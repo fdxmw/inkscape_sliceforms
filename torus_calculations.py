@@ -4,6 +4,7 @@ from common.point import Point
 
 from calculations import solve_quadratic
 
+
 def intersect_circle_line(radius, dx, angle, dy):
     '''Find the point where a circle intersects a line.
 
@@ -45,13 +46,15 @@ def intersect_circle_line(radius, dx, angle, dy):
     y = math.tan(angle) * x + dy
     return Point(x, y)
 
+
 def slot_corners(radius, dx, width, angle):
     '''Calculate slot corner coordinates.
 
     'angle' is the slot's angle, and 'width' is the slot's width.
 
-    Returns a pair of Points (P0, P1) that identify a slot's corners. The origin
-    is vertically centered between the slot's top-left and bottom-right corners.
+    Returns a pair of Points (P0, P1) that identify a slot's corners. The
+    origin is vertically centered between the slot's top-left and bottom-right
+    corners.
 
                 ▏
                 ▏P1

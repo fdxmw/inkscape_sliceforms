@@ -22,9 +22,11 @@ from cylinder_calculations import intersect_ellipse_line
 
 __version__ = '0.1'
 
+
 class OuterInner(IntEnum):
     OUTER = 0
     INNER = 1
+
 
 class SliceformCylinderGenerator(inkex.Effect):
     def __init__(self):
@@ -61,15 +63,16 @@ class SliceformCylinderGenerator(inkex.Effect):
                      fill_color, outer_inner: OuterInner):
         # Draw a backwards 'C' shape. The 'C' opens to the left.
         #
-        # The outer (rightmost) edge is an elliptical arc with horizontal radius
-        # outer_radius_x, and vertical radius outer_radius_y. The ellipse is
-        # centered at the midpoint of the bounding box's left side. The arc only
-        # uses the portion of the ellipse with non-negative x.
+        # The outer (rightmost) edge is an elliptical arc with horizontal
+        # radius outer_radius_x, and vertical radius outer_radius_y. The
+        # ellipse is centered at the midpoint of the bounding box's left
+        # side. The arc only uses the portion of the ellipse with non-negative
+        # x.
         #
         # The inner (leftmost) edge is an elliptical arc with horizontal radius
         # inner_radius_x, and vertical radius inner_radius_y. The ellipse is
-        # centered at the midpoint of the bounding box's left side. The arc only
-        # uses the portion of the ellipse with non-negative x.
+        # centered at the midpoint of the bounding box's left side. The arc
+        # only uses the portion of the ellipse with non-negative x.
         #
         # The outer and inner edges are connected by two vertical lines along
         # the bounding box's left side. vertical_gap is the length of these
@@ -154,7 +157,6 @@ class SliceformCylinderGenerator(inkex.Effect):
              stroke_color=defaults['cut_color'], fill_color=fill_color,
              commands=commands)
 
-
     def effect(self):
         self.stroke_width = str(self.svg.unittouu(defaults['stroke_width']))
         self.units = self.options.units
@@ -175,7 +177,8 @@ class SliceformCylinderGenerator(inkex.Effect):
         assert self.outer_radius > self.inner_radius, \
             'Error: Outer radius must be larger than inner radius'
 
-        self.loxodromic_angle = loxodromic_angle(self.height, self.outer_radius)
+        self.loxodromic_angle = loxodromic_angle(self.height,
+                                                 self.outer_radius)
 
         self.slot_width = calculate_slot_width(self.material_thickness,
                                                self.loxodromic_angle * 2)
@@ -193,8 +196,8 @@ class SliceformCylinderGenerator(inkex.Effect):
             outer_radius_x, outer_radius_y, 0, inner_radius_y).x
         slice_height = 2 * outer_radius_y
 
-        # Lay out templates in rows, with self.material_width as the maximum row
-        # width.
+        # Lay out templates in rows, with self.material_width as the maximum
+        # row width.
 
         # The first slice requires the full slice width, so compensate by
         # decreasing the material width by the width of one full slice.
@@ -225,7 +228,8 @@ class SliceformCylinderGenerator(inkex.Effect):
                                       self.svg.get_current_layer(),
                                       defaults['fill_colors'][outer_inner],
                                       outer_inner)
-                    top_left.x += additional_slice_width + self.template_spacing
+                    top_left.x += (additional_slice_width +
+                                   self.template_spacing)
                 top_left.y += slice_height + self.template_spacing
             return top_left
 
@@ -234,5 +238,6 @@ class SliceformCylinderGenerator(inkex.Effect):
         top_left = Point(0, 0)
         top_left = generate_templates(top_left, OuterInner.OUTER)
         generate_templates(top_left, OuterInner.INNER)
+
 
 SliceformCylinderGenerator().run()

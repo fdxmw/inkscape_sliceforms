@@ -2,7 +2,8 @@
 
 '''Inkscape extension that generates sliceform torus templates.'''
 
-# Paper with equations: https://www.heldermann-verlag.de/jgg/jgg15/j15h1mone.pdf
+# Paper with equations:
+#   https://www.heldermann-verlag.de/jgg/jgg15/j15h1mone.pdf
 # Assembly: https://www.youtube.com/watch?v=WVE-HeVFJ1k
 
 import math
@@ -21,9 +22,11 @@ from torus_calculations import intersect_circle_line, slot_corners
 
 __version__ = '0.1'
 
+
 class OuterInner(IntEnum):
     OUTER = 0
     INNER = 1
+
 
 class SliceformTorusGenerator(inkex.Effect):
     def __init__(self):
@@ -58,18 +61,18 @@ class SliceformTorusGenerator(inkex.Effect):
         # Draw a crescent moon shape, oriented like a closing parenthesis, with
         # the crescent moon's points vertically aligned on the left.
         #
-        # The outer edge is a circular arc with radius major_radius, centered at
-        # (0, minor_radius). The arc only uses the portion of the circle with
-        # non-negative x.
+        # The outer edge is a circular arc with radius major_radius, centered
+        # at (0, minor_radius). The arc only uses the portion of the circle
+        # with non-negative x.
         #
-        # The inner edge is a circular arc with radius major_radius, centered at
-        # (0, -minor_radius). The arc only uses the portion of the circle with
-        # non-negative x.
+        # The inner edge is a circular arc with radius major_radius, centered
+        # at (0, -minor_radius). The arc only uses the portion of the circle
+        # with non-negative x.
         #
         # top_left is the top left corner of the slice's bounding box.
         #
-        # top_point is the higher point where the outer and inner edges meet. It
-        # is on the y-axis, so top_point.x is 0, and top_point.y is
+        # top_point is the higher point where the outer and inner edges
+        # meet. It is on the y-axis, so top_point.x is 0, and top_point.y is
         # positive. Note that top_left and top_point are not equal.
         #
         # The outer and inner edges meet at two points:
@@ -82,7 +85,8 @@ class SliceformTorusGenerator(inkex.Effect):
             crescent moon's bounding box.
 
             '''
-            return Point(p.x + top_left.x, p.y + top_left.y + self.major_radius)
+            return Point(p.x + top_left.x,
+                         p.y + top_left.y + self.major_radius)
 
         # In display coordinates, higher y-values go down the screen, so the
         # top_point becomes the bottom_point and vice versa.
@@ -148,7 +152,6 @@ class SliceformTorusGenerator(inkex.Effect):
              stroke_color=defaults['cut_color'], fill_color=fill_color,
              commands=commands)
 
-
     def effect(self):
         self.stroke_width = str(self.svg.unittouu(defaults['stroke_width']))
         self.units = self.options.units
@@ -181,9 +184,9 @@ class SliceformTorusGenerator(inkex.Effect):
         angles = calculate_slot_angles(self.num_slices, self.loxodromic_angle)
 
         # top_point is the top left point where the inner and outer edges
-        # meet. Note that the top left corner of the bounding box is a different
-        # point. Calculate this point's coordinates by intersecting a vertical
-        # line through (0, 0) with the outer edge.
+        # meet. Note that the top left corner of the bounding box is a
+        # different point. Calculate this point's coordinates by intersecting a
+        # vertical line through (0, 0) with the outer edge.
         top_point = intersect_circle_line(self.major_radius, self.minor_radius,
                                           math.pi / 2, 0)
 
@@ -195,8 +198,8 @@ class SliceformTorusGenerator(inkex.Effect):
             self.major_radius, self.minor_radius, 0, top_point.y).x
         slice_height = self.major_radius * 2
 
-        # Lay out templates in rows, with self.material_width as the maximum row
-        # width.
+        # Lay out templates in rows, with self.material_width as the maximum
+        # row width.
 
         # The first slice requires the full slice width, so compensate by
         # decreasing the material width by the width of one full slice. Find
@@ -223,12 +226,14 @@ class SliceformTorusGenerator(inkex.Effect):
                                       self.svg.get_current_layer(),
                                       defaults['fill_colors'][outer_inner],
                                       outer_inner, top_point)
-                    top_left.x += additional_slice_width + self.template_spacing
+                    top_left.x += (additional_slice_width +
+                                   self.template_spacing)
                 top_left.y += slice_height + self.template_spacing
             return top_left
 
         top_left = Point(0, 0)
         top_left = generate_templates(top_left, OuterInner.OUTER)
         generate_templates(top_left, OuterInner.INNER)
+
 
 SliceformTorusGenerator().run()
