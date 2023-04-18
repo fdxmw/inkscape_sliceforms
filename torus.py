@@ -56,7 +56,7 @@ class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
         '''Convert from self.units to user units.'''
         return self.svg.unittouu(str(n) + self.units)
 
-    def render_slice(self, angles, parent, fill_color, outer_inner: OuterInner,
+    def render_slice(self, angles, fill_color, outer_inner: OuterInner,
                      top_point) -> PathElement:
         # Draw a crescent moon shape, oriented like a closing parenthesis, with
         # the crescent moon's points vertically aligned on the left.
@@ -226,8 +226,7 @@ class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
                 templates_generated += num_templates
                 for _ in range(num_templates):
                     path = self.render_slice(
-                        angles, self.svg.get_current_layer(),
-                        defaults['fill_colors'][outer_inner],
+                        angles, defaults['fill_colors'][outer_inner],
                         outer_inner, top_point)
 
                     translate = Transform()

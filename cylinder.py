@@ -13,9 +13,7 @@ from inkex.elements import PathElement
 from inkex.transforms import Transform
 
 from common.defaults import defaults
-from common.logging import log
-from common.path import move_abs, arc_abs, Size, Winding, line_abs
-from common.path import vline_rel, hline_rel
+from common.path import move_abs, arc_abs, Size, Winding, line_abs, vline_rel
 from common.point import Point, midpoint
 
 from calculations import calculate_slot_width, calculate_slot_angles
@@ -59,7 +57,7 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         '''Convert from self.units to user units.'''
         return self.svg.unittouu(str(n) + self.units)
 
-    def render_slice(self, angles, slice_height, parent, fill_color,
+    def render_slice(self, angles, slice_height, fill_color,
                      outer_inner: OuterInner) -> PathElement:
         # Draw a backwards 'C' shape. The 'C' opens to the left.
         #
@@ -230,7 +228,7 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
                 templates_generated += num_templates
                 for _ in range(num_templates):
                     path = self.render_slice(
-                        angles, slice_height, self.svg.get_current_layer(),
+                        angles, slice_height,
                         defaults['fill_colors'][outer_inner], outer_inner)
 
                     translate = Transform()
