@@ -11,10 +11,12 @@ from collections import namedtuple
 from enum import IntEnum
 
 import inkex
+from inkex.elements import PathElement
+from inkex.transforms import Transform
 
 from common.defaults import defaults
 from common.logging import log
-from common.path import path, move_abs, arc_abs, Size, Winding, line_abs
+from common.path import move_abs, arc_abs, Size, Winding, line_abs
 from common.point import Point, midpoint
 
 from calculations import calculate_slot_width, calculate_slot_angles
@@ -28,36 +30,34 @@ class OuterInner(IntEnum):
     INNER = 1
 
 
-class SliceformTorusGenerator(inkex.Effect):
-    def __init__(self):
-        # Call the base class constructor.
-        inkex.Effect.__init__(self)
-        # Define options
-        self.arg_parser.add_argument('--tab', type=str, dest='tab')
-        self.arg_parser.add_argument('--units', type=str,
-                                     dest='units', default='mm', help='Units')
-        self.arg_parser.add_argument('--major_radius', type=float,
-                                     dest='major_radius', default='30',
-                                     help='Major radius')
-        self.arg_parser.add_argument('--minor_radius', type=float,
-                                     dest='minor_radius', default='15',
-                                     help='minor radius')
-        self.arg_parser.add_argument('--num_slices', type=int,
-                                     dest='num_slices', default='6',
-                                     help='Number of slices')
-        self.arg_parser.add_argument('--material_thickness', type=float,
-                                     dest='material_thickness', default='.25',
-                                     help='Thickness of material')
-        self.arg_parser.add_argument('--material_width', type=float,
-                                     dest='material_width', default='203',
-                                     help='Width of material')
+class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
+    def add_arguments(self, pars):
+        pars.add_argument('--tab', type=str, dest='tab')
+        pars.add_argument('--units', type=str,
+                          dest='units', default='mm',
+                          help='Units')
+        pars.add_argument('--major_radius', type=float,
+                          dest='major_radius', default='30',
+                          help='Major radius')
+        pars.add_argument('--minor_radius', type=float,
+                          dest='minor_radius', default='15',
+                          help='minor radius')
+        pars.add_argument('--num_slices', type=int,
+                          dest='num_slices', default='6',
+                          help='Number of slices')
+        pars.add_argument('--material_thickness', type=float,
+                          dest='material_thickness', default='.25',
+                          help='Thickness of material')
+        pars.add_argument('--material_width', type=float,
+                          dest='material_width', default='203',
+                          help='Width of material')
 
     def to_uu(self, n: float):
         '''Convert from self.units to user units.'''
         return self.svg.unittouu(str(n) + self.units)
 
-    def render_slice(self, angles, top_left: Point, parent, fill_color,
-                     outer_inner: OuterInner, top_point):
+    def render_slice(self, angles, parent, fill_color, outer_inner: OuterInner,
+                     top_point) -> PathElement:
         # Draw a crescent moon shape, oriented like a closing parenthesis, with
         # the crescent moon's points vertically aligned on the left.
         #
@@ -69,15 +69,13 @@ class SliceformTorusGenerator(inkex.Effect):
         # at (0, -minor_radius). The arc only uses the portion of the circle
         # with non-negative x.
         #
-        # top_left is the top left corner of the slice's bounding box.
-        #
         # top_point is the higher point where the outer and inner edges
         # meet. It is on the y-axis, so top_point.x is 0, and top_point.y is
-        # positive. Note that top_left and top_point are not equal.
+        # positive.
         #
         # The outer and inner edges meet at two points:
         #   top_point and (0, -top_point.y).
-        def translate_point(p: Point) -> Point:
+        def to_display_coordinates(p: Point) -> Point:
             '''Translate a calculated point.
 
             Calculations assume (0, 0) is the midpoint between the crescent
@@ -85,13 +83,12 @@ class SliceformTorusGenerator(inkex.Effect):
             crescent moon's bounding box.
 
             '''
-            return Point(p.x + top_left.x,
-                         p.y + top_left.y + self.major_radius)
+            return Point(p.x, p.y + self.major_radius)
 
         # In display coordinates, higher y-values go down the screen, so the
         # top_point becomes the bottom_point and vice versa.
-        bottom_point = translate_point(top_point)
-        top_point = translate_point(Point(0, -top_point.y))
+        bottom_point = to_display_coordinates(top_point)
+        top_point = to_display_coordinates(Point(0, -top_point.y))
 
         # For each slot angle, collect three pairs of points:
         #  outer: Where the slot intersects the slice's outer edge.
@@ -102,11 +99,11 @@ class SliceformTorusGenerator(inkex.Effect):
         for angle in angles:
             outer_points = slot_corners(self.major_radius, self.minor_radius,
                                         self.slot_width, angle)
-            outer_points = [translate_point(p) for p in outer_points]
+            outer_points = [to_display_coordinates(p) for p in outer_points]
 
             inner_points = slot_corners(self.major_radius, -self.minor_radius,
                                         self.slot_width, angle)
-            inner_points = [translate_point(p) for p in inner_points]
+            inner_points = [to_display_coordinates(p) for p in inner_points]
 
             middle_points = [midpoint(inner_points[0], outer_points[0]),
                              midpoint(inner_points[1], outer_points[1])]
@@ -148,11 +145,16 @@ class SliceformTorusGenerator(inkex.Effect):
         commands += arc_abs(self.major_radius, self.major_radius,
                             Size.SMALL, Winding.CW, bottom_point)
         commands += 'Z'
-        path(parent=parent, stroke_width=self.stroke_width,
-             stroke_color=defaults['cut_color'], fill_color=fill_color,
-             commands=commands)
 
-    def effect(self):
+        path = PathElement()
+        path.style = inkex.styles.Style(style={
+            'stroke_width': self.stroke_width,
+            'stroke': defaults['cut_color'],
+            'fill': fill_color})
+        path.set_path(commands)
+        return path
+
+    def generate(self):
         self.stroke_width = str(self.svg.unittouu(defaults['stroke_width']))
         self.units = self.options.units
 
@@ -211,6 +213,7 @@ class SliceformTorusGenerator(inkex.Effect):
         templates_per_row = (
             1 + math.floor(material_width /
                            (additional_slice_width + self.template_spacing)))
+        num_rows = math.ceil(self.num_slices / templates_per_row)
 
         # Generate two rows of slice templates. The top row has slots on the
         # outer edge, and the bottom row has slots on the inner edge.
@@ -222,18 +225,24 @@ class SliceformTorusGenerator(inkex.Effect):
                                     self.num_slices - templates_generated)
                 templates_generated += num_templates
                 for _ in range(num_templates):
-                    self.render_slice(angles, top_left,
-                                      self.svg.get_current_layer(),
-                                      defaults['fill_colors'][outer_inner],
-                                      outer_inner, top_point)
+                    path = self.render_slice(
+                        angles, self.svg.get_current_layer(),
+                        defaults['fill_colors'][outer_inner],
+                        outer_inner, top_point)
+
+                    translate = Transform()
+                    translate.add_translate(top_left.x, top_left.y)
+                    path.transform = translate
+                    yield path
+
                     top_left.x += (additional_slice_width +
                                    self.template_spacing)
                 top_left.y += slice_height + self.template_spacing
-            return top_left
 
         top_left = Point(0, 0)
-        top_left = generate_templates(top_left, OuterInner.OUTER)
-        generate_templates(top_left, OuterInner.INNER)
+        yield from generate_templates(top_left, OuterInner.OUTER)
+        top_left = Point(0, num_rows * (slice_height + self.template_spacing))
+        yield from generate_templates(top_left, OuterInner.INNER)
 
 
 SliceformTorusGenerator().run()

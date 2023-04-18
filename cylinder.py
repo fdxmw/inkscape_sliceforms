@@ -9,10 +9,12 @@ from collections import namedtuple
 from enum import IntEnum
 
 import inkex
+from inkex.elements import PathElement
+from inkex.transforms import Transform
 
 from common.defaults import defaults
 from common.logging import log
-from common.path import path, move_abs, arc_abs, Size, Winding, line_abs
+from common.path import move_abs, arc_abs, Size, Winding, line_abs
 from common.path import vline_rel, hline_rel
 from common.point import Point, midpoint
 
@@ -28,39 +30,37 @@ class OuterInner(IntEnum):
     INNER = 1
 
 
-class SliceformCylinderGenerator(inkex.Effect):
-    def __init__(self):
-        # Call the base class constructor.
-        inkex.Effect.__init__(self)
-        # Define options
-        self.arg_parser.add_argument('--tab', type=str, dest='tab')
-        self.arg_parser.add_argument('--units', type=str,
-                                     dest='units', default='mm', help='Units')
-        self.arg_parser.add_argument('--outer_radius', type=float,
-                                     dest='outer_radius', default='30',
-                                     help='Outer radius')
-        self.arg_parser.add_argument('--inner_radius', type=float,
-                                     dest='inner_radius', default='15',
-                                     help='Inner radius')
-        self.arg_parser.add_argument('--height', type=float,
-                                     dest='height', default='15',
-                                     help='height')
-        self.arg_parser.add_argument('--num_slices', type=int,
-                                     dest='num_slices', default='6',
-                                     help='Number of slices')
-        self.arg_parser.add_argument('--material_thickness', type=float,
-                                     dest='material_thickness', default='.25',
-                                     help='Thickness of material')
-        self.arg_parser.add_argument('--material_width', type=float,
-                                     dest='material_width', default='203',
-                                     help='Width of material')
+class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
+    def add_arguments(self, pars):
+        pars.add_argument('--tab', type=str, dest='tab')
+        pars.add_argument('--units', type=str,
+                          dest='units', default='mm',
+                          help='Units')
+        pars.add_argument('--outer_radius', type=float,
+                          dest='outer_radius', default='30',
+                          help='Outer radius')
+        pars.add_argument('--inner_radius', type=float,
+                          dest='inner_radius', default='15',
+                          help='Inner radius')
+        pars.add_argument('--height', type=float,
+                          dest='height', default='15',
+                          help='height')
+        pars.add_argument('--num_slices', type=int,
+                          dest='num_slices', default='6',
+                          help='Number of slices')
+        pars.add_argument('--material_thickness', type=float,
+                          dest='material_thickness', default='.25',
+                          help='Thickness of material')
+        pars.add_argument('--material_width', type=float,
+                          dest='material_width', default='203',
+                          help='Width of material')
 
     def to_uu(self, n: float):
         '''Convert from self.units to user units.'''
         return self.svg.unittouu(str(n) + self.units)
 
-    def render_slice(self, angles, slice_height, top_left: Point, parent,
-                     fill_color, outer_inner: OuterInner):
+    def render_slice(self, angles, slice_height, parent, fill_color,
+                     outer_inner: OuterInner) -> PathElement:
         # Draw a backwards 'C' shape. The 'C' opens to the left.
         #
         # The outer (rightmost) edge is an elliptical arc with horizontal
@@ -91,7 +91,7 @@ class SliceformCylinderGenerator(inkex.Effect):
             corner of the bounding box.
 
             '''
-            return Point(p.x + top_left.x, p.y + top_left.y + outer_radius_y)
+            return Point(p.x, p.y + outer_radius_y)
 
         # For each slot angle, collect three pairs of points:
         #  outer: Where the slot intersects the slice's outer edge.
@@ -115,7 +115,7 @@ class SliceformCylinderGenerator(inkex.Effect):
                 outer=outer_points, middle=middle_points, inner=inner_points))
 
         # Start at the bottom left point.
-        bottom_left = Point(top_left.x, top_left.y + slice_height)
+        bottom_left = Point(0, slice_height)
         commands = move_abs(bottom_left)
 
         # Draw the larger arc, counterclockwise from the bottom left corner.
@@ -127,13 +127,13 @@ class SliceformCylinderGenerator(inkex.Effect):
                 commands += line_abs(intersection.middle[0])
                 commands += line_abs(intersection.middle[1])
                 commands += line_abs(intersection.outer[1])
-            # Draw the last segment of the larger arc, ending at the top_left
+            # Draw the last segment of the larger arc, ending at (0, 0).
             # point.
             commands += arc_abs(outer_radius_x, outer_radius_y,
-                                Size.SMALL, Winding.CCW, top_left)
+                                Size.SMALL, Winding.CCW, Point(0, 0))
         else:
             commands += arc_abs(outer_radius_x, outer_radius_y,
-                                Size.LARGE, Winding.CCW, top_left)
+                                Size.LARGE, Winding.CCW, Point(0, 0))
 
         commands += vline_rel(vertical_gap)
 
@@ -147,17 +147,21 @@ class SliceformCylinderGenerator(inkex.Effect):
                 commands += line_abs(intersection.middle[1])
                 commands += line_abs(intersection.inner[1])
         # Draw the last segment of the smaller arc, ending at the bottom point.
-        bottom_left_inner = Point(top_left.x, (top_left.y + vertical_gap +
-                                               inner_radius_y * 2))
+        bottom_left_inner = Point(0, vertical_gap + inner_radius_y * 2)
         commands += arc_abs(inner_radius_x, inner_radius_y,
                             Size.SMALL, Winding.CW,
                             bottom_left_inner)
         commands += 'Z'
-        path(parent=parent, stroke_width=self.stroke_width,
-             stroke_color=defaults['cut_color'], fill_color=fill_color,
-             commands=commands)
 
-    def effect(self):
+        path = PathElement()
+        path.style = inkex.styles.Style(style={
+            'stroke_width': self.stroke_width,
+            'stroke': defaults['cut_color'],
+            'fill': fill_color})
+        path.set_path(commands)
+        return path
+
+    def generate(self):
         self.stroke_width = str(self.svg.unittouu(defaults['stroke_width']))
         self.units = self.options.units
 
@@ -207,6 +211,7 @@ class SliceformCylinderGenerator(inkex.Effect):
         templates_per_row = (
             1 + math.floor(material_width /
                            (additional_slice_width + self.template_spacing)))
+        num_rows = math.ceil(self.num_slices / templates_per_row)
 
         def generate_templates(top_left, outer_inner: OuterInner):
             '''Render rows of slices starting at top_left.
@@ -224,20 +229,25 @@ class SliceformCylinderGenerator(inkex.Effect):
                                     self.num_slices - templates_generated)
                 templates_generated += num_templates
                 for _ in range(num_templates):
-                    self.render_slice(angles, slice_height, top_left,
-                                      self.svg.get_current_layer(),
-                                      defaults['fill_colors'][outer_inner],
-                                      outer_inner)
+                    path = self.render_slice(
+                        angles, slice_height, self.svg.get_current_layer(),
+                        defaults['fill_colors'][outer_inner], outer_inner)
+
+                    translate = Transform()
+                    translate.add_translate(top_left.x, top_left.y)
+                    path.transform = translate
+                    yield path
+
                     top_left.x += (additional_slice_width +
                                    self.template_spacing)
                 top_left.y += slice_height + self.template_spacing
-            return top_left
 
         # Generate two sets of slice templates. The first set has slots on the
         # outer edge, and the second set has slots on the inner edge.
         top_left = Point(0, 0)
-        top_left = generate_templates(top_left, OuterInner.OUTER)
-        generate_templates(top_left, OuterInner.INNER)
+        yield from generate_templates(top_left, OuterInner.OUTER)
+        top_left = Point(0, num_rows * (slice_height + self.template_spacing))
+        yield from generate_templates(top_left, OuterInner.INNER)
 
 
 SliceformCylinderGenerator().run()
