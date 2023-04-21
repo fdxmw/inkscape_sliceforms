@@ -1,7 +1,5 @@
 import math
 
-from common.point import Point
-
 
 def calculate_slot_width(material_thickness: float, lie_flat_angle: float):
     '''Calculate slot width, based on thickness and desired flatness.

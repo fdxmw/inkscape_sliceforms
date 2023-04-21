@@ -64,5 +64,6 @@ class TestHyperbolaCalculations(unittest.TestCase):
         self.assertAlmostEqual(intersections[0].y, -1.5)
         self.assertAlmostEqual(intersections[1].y, -1.5)
 
+
 if __name__ == '__main__':
     unittest.main()

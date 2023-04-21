@@ -37,13 +37,15 @@ def check_slice_intersection(
         intersection: Point, outer_waist_radius: float,
         inner_radius: float, half_slice_height: float) -> Point:
     '''If the intersection is on the slice, return intersection, else None.'''
-    if (intersection.x >= inner_radius and
-        intersection.x <= outer_waist_radius and
-        intersection.y >= -half_slice_height and
-        intersection.y <= half_slice_height):
+    on_slice = (intersection.x >= inner_radius and
+                intersection.x <= outer_waist_radius and
+                intersection.y >= -half_slice_height and
+                intersection.y <= half_slice_height)
+    if on_slice:
         return intersection
     else:
         return None
+
 
 def intersect_vertical_line(
         vx: float, angle: float, dy: float, outer_waist_radius: float,
@@ -83,9 +85,11 @@ def intersect_horizontal_line(
                                     outer_waist_radius, inner_radius,
                                     half_slice_height)
 
+
 class OuterInner(IntEnum):
     OUTER = 0
     INNER = 1
+
 
 def slot_corners(outer_waist_radius: float, inner_radius: float,
                  half_slice_height: float, outer_inner: OuterInner,
@@ -195,6 +199,7 @@ def slot_corners(outer_waist_radius: float, inner_radius: float,
         # inner_radius 20
         # height 80
         # num_slices 16
+
 
 def main():
     outer_waist_radius = 22

@@ -12,9 +12,8 @@ from inkex.elements import PathElement
 from inkex.transforms import Transform
 
 from common.defaults import defaults
-from common.path import move_abs, arc_abs, Size, Winding, line_abs, vline_rel
+from common.path import move_abs, line_abs
 from common.point import Point, midpoint
-from common.logging import log
 
 from calculations import calculate_slot_width, calculate_slot_angles
 from hyperbola_calculations import loxodromic_angle, OuterInner, slot_corners
@@ -22,8 +21,11 @@ from hyperbola_calculations import loxodromic_angle, OuterInner, slot_corners
 __version__ = '0.1'
 
 epsilon = 0.000001
+
+
 def near(x, y):
     return abs(x - y) < epsilon
+
 
 class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
     def add_arguments(self, pars):
@@ -141,7 +143,6 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
             assert intersections[-1].middle[1] is None
             assert intersections[-1].inner[1] is None
 
-            clip_corners = True
             bottom_left = intersections[0].outer[1]
             top_left = intersections[-1].outer[0]
             inner_edge_corners = [intersections[-1].inner[0],
@@ -150,7 +151,6 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
             # Remove first and last intersections, they are handled separately.
             intersections = intersections[1:][:-1]
         else:
-            clip_corners = False
             bottom_left = Point(0, slice_height)
             top_left = Point(0, 0)
             inner_edge_corners = None
@@ -212,7 +212,6 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
 
             # Draw the top edge.
             found_top_edge = False
-            last_top_intersection = None
             for intersection in intersections:
                 if not found_top_edge:
                     if not near(intersection.outer[0].y, 0):
@@ -288,7 +287,6 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
 
         self.loxodromic_angle = loxodromic_angle(
             self.height, self.outer_edge_radius, self.outer_waist_radius)
-        log('loxodromic_angle', math.degrees(self.loxodromic_angle))
 
         self.slot_width = calculate_slot_width(self.material_thickness,
                                                self.loxodromic_angle * 2)

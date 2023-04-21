@@ -15,7 +15,6 @@ from inkex.elements import PathElement
 from inkex.transforms import Transform
 
 from common.defaults import defaults
-from common.logging import log
 from common.path import move_abs, arc_abs, Size, Winding, line_abs
 from common.point import Point, midpoint
 
