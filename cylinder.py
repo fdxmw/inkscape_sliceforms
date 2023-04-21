@@ -81,7 +81,7 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         inner_radius_y = self.inner_radius / math.cos(self.loxodromic_angle)
         vertical_gap = outer_radius_y - inner_radius_y
 
-        def translate_point(p: Point) -> Point:
+        def to_display_coordinates(p: Point) -> Point:
             '''Translate a calculated point.
 
             Calculations assume (0, 0) is centered at the midpoint of the
@@ -100,11 +100,11 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         for angle in angles:
             outer_points = slot_corners(outer_radius_x, outer_radius_y, angle,
                                         self.slot_width)
-            outer_points = [translate_point(op) for op in outer_points]
+            outer_points = [to_display_coordinates(op) for op in outer_points]
 
             inner_points = slot_corners(inner_radius_x, inner_radius_y, angle,
                                         self.slot_width)
-            inner_points = [translate_point(ip) for ip in inner_points]
+            inner_points = [to_display_coordinates(ip) for ip in inner_points]
 
             middle_points = [midpoint(inner_points[0], outer_points[0]),
                              midpoint(inner_points[1], outer_points[1])]
@@ -153,7 +153,7 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
 
         path = PathElement()
         path.style = inkex.styles.Style(style={
-            'stroke_width': self.stroke_width,
+            'stroke-width': self.stroke_width,
             'stroke': defaults['cut_color'],
             'fill': fill_color})
         path.set_path(commands)

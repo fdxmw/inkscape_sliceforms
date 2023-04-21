@@ -148,7 +148,7 @@ class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
 
         path = PathElement()
         path.style = inkex.styles.Style(style={
-            'stroke_width': self.stroke_width,
+            'stroke-width': self.stroke_width,
             'stroke': defaults['cut_color'],
             'fill': fill_color})
         path.set_path(commands)
