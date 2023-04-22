@@ -84,8 +84,8 @@ use a number of slices divisible by 4.
 
 Generally, for N° corners, set outer_edge_radius to outer_waist_radius /
 math.sin(math.radians(N / 2)). To make the slices end at each intersection, 360
-must by evenly divisble by N, and the number of slices must be evenly divisible
-by (360 / N).
+must by evenly divisible by N, and the number of slices must be evenly
+divisible by (360 / N).
 
 Setting the height to outer_edge_radius works well.
       </param>
