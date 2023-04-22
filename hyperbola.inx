@@ -15,13 +15,13 @@
 
       <param name="outer_edge_radius" type="float" precision="2"
 	     min="0.1" max="10000"
-	     _gui-text="Outer radius, at edge (widest points)">40</param>
+	     _gui-text="Outer edge radius (top and bottom, widest points)">40</param>
       <param name="outer_waist_radius" type="float" precision="2"
 	     min="0.1" max="10000"
-	     _gui-text="Outer radius, at middle (narrowest point)">30</param>
+	     _gui-text="Outer waist radius (middle, narrowest point)">30</param>
       <param name="inner_radius" type="float" precision="2"
 	     min="0.1" max="10000"
-	     _gui-text="Inner radius">20</param>
+	     _gui-text="Inner radius (middle, narrowest point)">20</param>
       <param name="height" type="float" precision="2"
 	     min="0.1" max="10000"
 	     _gui-text="Height">40</param>
@@ -38,38 +38,54 @@
 	     xml:space="preserve">Generate sliceform hyperbola templates.
 
 Recommended settings:
+
+  outer edge radius: 88.99mm
+  outer waist radius: 27.5mm
+  inner radius: 20mm
+  height: 88.99mm
+  slices: 20
+  (36° corners)
+
+  outer edge radius: 71.86mm
+  outer waist radius: 27.5mm
+  inner radius: 20mm
+  height: 71.86mm
+  slices: 16
+  (45° corners)
+
   outer edge radius: 60mm
   outer waist radius: 30mm
-  inner radius: 22.5mm
+  inner radius: 20mm
   height: 60mm
   slices: 18
-  (slices form equilateral triangles)
-
-  outer edge radius: 49.5mm
-  outer waist radius: 35mm
-  inner radius: 27.5mm
-  height: 49.5mm
-  slices: 12
-  (slices form squares)
+  (60° corners)
 
   outer edge radius: 42.53mm
   outer waist radius: 25mm
   inner radius: 17.5mm
   height: 42.53mm
-  slices: 15
-  (slices form pentagons)
+  slices: 20
+  (72° corners)
 
-For 60° slice intersections, set outer_edge_radius to outer_waist_radius * 2
-and use a number of slices divisible by 6.
+  outer edge radius: 49.5mm
+  outer waist radius: 35mm
+  inner radius: 25mm
+  height: 49.5mm
+  slices: 16
+  (90° corners)
 
-For 90° slice intersections, set outer_edge_radius to outer_waist_radius *
-math.sqrt(2) and use a number of slices divisible by 4.
+"corners" are where slices meet at the model's outer edge.
 
-Generally: For N° slice intersections, set outer_edge_radius to
-outer_waist_radius / math.sin(math.radians(N / 2)) and to make the slices end
-at each intersection, 360 must by evenly divisble by N. If N is even, the
-number of slices must be evenly divisble by N. If N is odd, the number of
-slices must be evenly divisible by 2N.
+For 60° corners, set outer_edge_radius to outer_waist_radius * 2 and use a
+number of slices divisible by 6.
+
+For 90° corners, set outer_edge_radius to outer_waist_radius * math.sqrt(2) and
+use a number of slices divisible by 4.
+
+Generally, for N° corners, set outer_edge_radius to outer_waist_radius /
+math.sin(math.radians(N / 2)). To make the slices end at each intersection, 360
+must by evenly divisble by N, and the number of slices must be evenly divisible
+by (360 / N).
 
 Setting the height to outer_edge_radius works well.
       </param>
