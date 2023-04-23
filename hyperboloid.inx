@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <_name>Hyperbola Template Generator</_name>
-  <id>org.lauj.inkscape_sliceforms_hyperbola</id>
+  <_name>Hyperboloid Template Generator</_name>
+  <id>org.lauj.inkscape_sliceforms_hyperboloid</id>
 
-  <dependency type="executable" location="extensions">hyperbola.py</dependency>
+  <dependency type="executable" location="extensions">hyperboloid.py</dependency>
 
   <param name="tab" type="notebook">
     <page name="options" _gui-text="Options">
@@ -15,7 +15,7 @@
 
       <param name="outer_edge_radius" type="float" precision="2"
 	     min="0.1" max="10000"
-	     _gui-text="Outer edge radius (top and bottom, widest points)">40</param>
+	     _gui-text="Outer edge radius (top and bottom, widest points)">60</param>
       <param name="outer_waist_radius" type="float" precision="2"
 	     min="0.1" max="10000"
 	     _gui-text="Outer waist radius (middle, narrowest point)">30</param>
@@ -24,9 +24,9 @@
 	     _gui-text="Inner radius (middle, narrowest point)">20</param>
       <param name="height" type="float" precision="2"
 	     min="0.1" max="10000"
-	     _gui-text="Height">40</param>
+	     _gui-text="Height">60</param>
       <param name="num_slices" type="int"
-	     min="1" max="1000" _gui-text="Number of slices in each direction">14</param>
+	     min="1" max="1000" _gui-text="Number of slices in each direction">18</param>
       <param name="material_thickness" type="float" precision="2"
 	     min="0.1" max="5" _gui-text="Thickness of material">.25</param>
       <param name="material_width" type="float" precision="2"
@@ -35,16 +35,9 @@
     </page>
     <page name="help" _gui-text="Help">
       <param name="help_text" type="description"
-	     xml:space="preserve">Generate sliceform hyperbola templates.
+	     xml:space="preserve">Generate sliceform templates for a hyperboloid of one sheet.
 
 Recommended settings:
-
-  outer edge radius: 71.86mm
-  outer waist radius: 27.5mm
-  inner radius: 20mm
-  height: 71.86mm
-  slices: 16
-  (45° corners)
 
   outer edge radius: 60mm
   outer waist radius: 30mm
@@ -62,9 +55,7 @@ Recommended settings:
 
 "corners" are where slices meet at the model's outer edge.
 
-For N° corners, set outer_edge_radius to outer_waist_radius / sin(N° / 2). To
-make the slices end at each intersection, 360 must by evenly divisible by N°,
-and the number of slices must be evenly divisible by (360 / N°).
+For N° corners, set outer_edge_radius to outer_waist_radius / sin(N° / 2). To make the slices end at each intersection, 360 must by evenly divisible by N°, and the number of slices must be evenly divisible by (360 / N°).
 
 Setting the height to outer_edge_radius works well.
       </param>
@@ -78,6 +69,6 @@ Setting the height to outer_edge_radius works well.
     </effects-menu>
   </effect>
   <script>
-    <command reldir="inx" interpreter="python">hyperbola.py</command>
+    <command reldir="inx" interpreter="python">hyperboloid.py</command>
   </script>
 </inkscape-extension>

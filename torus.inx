@@ -20,7 +20,7 @@
 	     min="0.1" max="10000"
 	     _gui-text="Minor radius (doughnut cross section radius)">17.5</param>
       <param name="num_slices" type="int"
-	     min="1" max="1000" _gui-text="Number of slices in each direction">8</param>
+	     min="1" max="1000" _gui-text="Number of slices in each direction">10</param>
       <param name="material_thickness" type="float" precision="2"
 	     min="0.1" max="5" _gui-text="Thickness of material">.25</param>
       <param name="material_width" type="float" precision="2"
@@ -34,7 +34,7 @@
 Recommended settings:
   major radius: 40mm
   minor radius: 17.5mm
-  slices: 8
+  slices: 10
   material thickness: .25mm
 
 Assembly video: https://www.youtube.com/watch?v=WVE-HeVFJ1k

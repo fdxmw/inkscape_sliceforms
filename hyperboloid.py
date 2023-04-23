@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-'''Inkscape extension that generates sliceform hyperbola templates.
+'''Inkscape extension that generates sliceform hyperboloid templates.
 
 Generates sliceform templates for a hyperboloid of one sheet.
 
@@ -21,7 +21,7 @@ from common import path
 from common import point
 
 import calculations
-import hyperbola_calculations
+import hyperboloid_calculations
 
 __version__ = '0.1'
 
@@ -32,26 +32,26 @@ def near(x, y):
     return abs(x - y) < epsilon
 
 
-class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
+class SliceformHyperboloidGenerator(inkex.extensions.GenerateExtension):
     def add_arguments(self, pars):
         pars.add_argument('--tab', type=str, dest='tab')
         pars.add_argument('--units', type=str,
                           dest='units', default='mm',
                           help='Units')
         pars.add_argument('--outer_edge_radius', type=float,
-                          dest='outer_edge_radius', default='40',
+                          dest='outer_edge_radius', default='60',
                           help='Outer edge radius')
         pars.add_argument('--outer_waist_radius', type=float,
                           dest='outer_waist_radius', default='30',
                           help='Outer waist radius')
         pars.add_argument('--inner_radius', type=float,
-                          dest='inner_radius', default='15',
+                          dest='inner_radius', default='20',
                           help='Inner radius')
         pars.add_argument('--height', type=float,
-                          dest='height', default='15',
+                          dest='height', default='60',
                           help='height')
         pars.add_argument('--num_slices', type=int,
-                          dest='num_slices', default='6',
+                          dest='num_slices', default='18',
                           help='Number of slices')
         pars.add_argument('--material_thickness', type=float,
                           dest='material_thickness', default='.25',
@@ -66,7 +66,7 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
 
     def render_slice(
             self, angles, slice_width, slice_height, fill_color,
-            outer_inner: hyperbola_calculations.OuterInner
+            outer_inner: hyperboloid_calculations.OuterInner
     ) -> elements.PathElement:
         '''Draw a rectangular slice with slice_width and slice_height.
 
@@ -106,9 +106,9 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
             'Intersection', ['outer', 'middle', 'inner'])
         intersections = []
         for angle in angles:
-            outer_points = hyperbola_calculations.slot_corners(
+            outer_points = hyperboloid_calculations.slot_corners(
                 self.outer_waist_radius, self.inner_radius, half_slice_height,
-                hyperbola_calculations.OuterInner.OUTER, angle,
+                hyperboloid_calculations.OuterInner.OUTER, angle,
                 self.slot_width)
             if outer_points[0] is None and outer_points[1] is None:
                 # Slot does not intersect the slice.
@@ -116,9 +116,9 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
 
             outer_points = [to_display_coordinates(op) for op in outer_points]
 
-            inner_points = hyperbola_calculations.slot_corners(
+            inner_points = hyperboloid_calculations.slot_corners(
                 self.outer_waist_radius, self.inner_radius, half_slice_height,
-                hyperbola_calculations.OuterInner.INNER, angle,
+                hyperboloid_calculations.OuterInner.INNER, angle,
                 self.slot_width)
             inner_points = [to_display_coordinates(ip) for ip in inner_points]
 
@@ -176,7 +176,7 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
         bottom_right = point.Point(slice_width, slice_height)
         top_right = point.Point(slice_width, 0)
 
-        if outer_inner == hyperbola_calculations.OuterInner.OUTER:
+        if outer_inner == hyperboloid_calculations.OuterInner.OUTER:
             # Draw the bottom edge.
             omit_bottom_right = False
             for intersection in intersections:
@@ -255,7 +255,7 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
         if inner_edge_corners is not None:
             commands += path.line_abs(inner_edge_corners[0])
 
-        if outer_inner == hyperbola_calculations.OuterInner.INNER:
+        if outer_inner == hyperboloid_calculations.OuterInner.INNER:
             for intersection in reversed(intersections):
                 commands += path.line_abs(intersection.inner[1])
                 commands += path.line_abs(intersection.middle[1])
@@ -301,7 +301,7 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
         assert self.outer_waist_radius > self.inner_radius, \
             'Error: Outer waist radius must be larger than inner radius'
 
-        self.loxodromic_angle = hyperbola_calculations.loxodromic_angle(
+        self.loxodromic_angle = hyperboloid_calculations.loxodromic_angle(
             self.height, self.outer_edge_radius, self.outer_waist_radius)
 
         self.slot_width = calculations.slot_width(self.material_thickness,
@@ -312,7 +312,7 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
 
         slice_width = self.outer_waist_radius - self.inner_radius
 
-        # Calculate the diagonal distance from the hyperbola's center to
+        # Calculate the diagonal distance from the hyperboloid's center to
         # outer_edge_radius. This makes a right triangle with sides
         # outer_edge_radius and (height / 2), and hypotenuse
         # diagonal_edge_radius.
@@ -332,8 +332,9 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
                                        (slice_width + self.template_spacing))
         num_rows = math.ceil(self.num_slices / templates_per_row)
 
-        def generate_templates(top_left,
-                               outer_inner: hyperbola_calculations.OuterInner):
+        def generate_templates(
+                top_left,
+                outer_inner: hyperboloid_calculations.OuterInner):
             '''Render rows of slices starting at top_left.
 
             outer_inner determines whether the slots appear on the outer or
@@ -365,13 +366,13 @@ class SliceformHyperbolaGenerator(inkex.extensions.GenerateExtension):
         # Generate two sets of slice templates. The first set has slots on the
         # outer edge, and the second set has slots on the inner edge.
         top_left = point.Point(0, 0)
-        yield from generate_templates(top_left,
-                                      hyperbola_calculations.OuterInner.OUTER)
+        yield from generate_templates(
+            top_left, hyperboloid_calculations.OuterInner.OUTER)
         top_left = point.Point(
             0,
             num_rows * (slice_height + self.template_spacing))
-        yield from generate_templates(top_left,
-                                      hyperbola_calculations.OuterInner.INNER)
+        yield from generate_templates(
+            top_left, hyperboloid_calculations.OuterInner.INNER)
 
 
-SliceformHyperbolaGenerator().run()
+SliceformHyperboloidGenerator().run()

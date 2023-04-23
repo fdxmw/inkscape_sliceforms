@@ -37,13 +37,13 @@ class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
                           dest='units', default='mm',
                           help='Units')
         pars.add_argument('--major_radius', type=float,
-                          dest='major_radius', default='30',
+                          dest='major_radius', default='40',
                           help='Major radius')
         pars.add_argument('--minor_radius', type=float,
-                          dest='minor_radius', default='15',
+                          dest='minor_radius', default='17.5',
                           help='minor radius')
         pars.add_argument('--num_slices', type=int,
-                          dest='num_slices', default='6',
+                          dest='num_slices', default='10',
                           help='Number of slices')
         pars.add_argument('--material_thickness', type=float,
                           dest='material_thickness', default='.25',

@@ -6,10 +6,10 @@ from common import point
 
 def loxodromic_angle(height: float, outer_edge_radius: float,
                      outer_waist_radius: float) -> float:
-    '''Calculate slice intersection angle for hyperbola.
+    '''Calculate slice intersection angle for hyperboloid.
 
     The loxodromic_angle is the angle of each slice relative to the base of the
-    hyperbola.
+    hyperboloid.
 
     '''
     # Draw a right triangle with sides outer_waist_radius and slice_base, and

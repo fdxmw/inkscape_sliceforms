@@ -37,16 +37,16 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
                           dest='units', default='mm',
                           help='Units')
         pars.add_argument('--outer_radius', type=float,
-                          dest='outer_radius', default='30',
+                          dest='outer_radius', default='35',
                           help='Outer radius')
         pars.add_argument('--inner_radius', type=float,
-                          dest='inner_radius', default='15',
+                          dest='inner_radius', default='26',
                           help='Inner radius')
         pars.add_argument('--height', type=float,
-                          dest='height', default='15',
+                          dest='height', default='40',
                           help='height')
         pars.add_argument('--num_slices', type=int,
-                          dest='num_slices', default='6',
+                          dest='num_slices', default='14',
                           help='Number of slices')
         pars.add_argument('--material_thickness', type=float,
                           dest='material_thickness', default='.25',
