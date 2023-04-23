@@ -1,8 +1,8 @@
 import math
 
-from common.point import Point
+from common import point
 
-from calculations import solve_quadratic
+import calculations
 
 
 def loxodromic_angle(height, radius):
@@ -16,7 +16,7 @@ def loxodromic_angle(height, radius):
     return math.atan((height / 2) / radius)
 
 
-def intersect_ellipse_line(x_radius, y_radius, angle, dy) -> Point:
+def intersect_ellipse_line(x_radius, y_radius, angle, dy) -> point.Point:
     '''Intersect an ellipse and a line.
 
     The ellipse is centered at the origin, with horizontal radius x_radius and
@@ -59,9 +59,9 @@ def intersect_ellipse_line(x_radius, y_radius, angle, dy) -> Point:
     b = x_radius * x_radius * 2 * math.tan(angle) * dy
     c = x_radius * x_radius * (dy * dy - y_radius * y_radius)
 
-    x = solve_quadratic(a, b, c)
+    x = calculations.solve_quadratic(a, b, c)
     y = math.tan(angle) * x + dy
-    return Point(x, y)
+    return point.Point(x, y)
 
 
 def slot_corners(x_radius, y_radius, angle, width):
@@ -69,15 +69,15 @@ def slot_corners(x_radius, y_radius, angle, width):
 
     'angle' is the slot's angle, and 'width' is the slot's width.
 
-    Returns a pair of Points (P0, P1) that identify a slot's corners. The
-    origin is vertically centered between the slot's top-left and bottom-right
-    corners.
+    Returns a pair of Points (first, second) that identify a slot's
+    corners. The origin is vertically centered between the slot's top-left and
+    bottom-right corners.
 
                 ▏
-                ▏P1
+                ▏first
                ╱
               ╱
-             ╱   P0
+             ╱   second
             ╱  ╱▏
            ╱  ╱ ▏
           ╱  ╱

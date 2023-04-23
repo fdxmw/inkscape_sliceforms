@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <_name>Torus Template Generator</_name>
+  <_name>Torus Templates</_name>
   <id>org.lauj.inkscape_sliceforms_torus</id>
 
   <dependency type="executable" location="extensions">torus.py</dependency>
@@ -29,13 +29,16 @@
     </page>
     <page name="help" _gui-text="Help">
       <param name="help_text" type="description"
-	     xml:space="preserve">Generate sliceform torus templates.
+	     xml:space="preserve">Generate sliceform templates for a torus.
 
 Recommended settings:
   major radius: 40mm
   minor radius: 17.5mm
   slices: 8
   material thickness: .25mm
+
+Assembly video: https://www.youtube.com/watch?v=WVE-HeVFJ1k
+Paper: https://www.heldermann-verlag.de/jgg/jgg15/j15h1mone.pdf
   </param>
     </page>
   </param>

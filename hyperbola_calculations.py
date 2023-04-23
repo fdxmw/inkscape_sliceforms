@@ -1,7 +1,7 @@
-from enum import IntEnum
+import enum
 import math
 
-from common.point import Point
+from common import point
 
 
 def loxodromic_angle(height: float, outer_edge_radius: float,
@@ -23,19 +23,9 @@ def loxodromic_angle(height: float, outer_edge_radius: float,
     return math.atan((height / 2) / slice_base)
 
 
-def calculate_height(outer_waist_radius: float,
-                     loxodromic_angle: float) -> float:
-    '''Calculate a hyperbola's height.
-
-    This is useful for creating a hyperbola with a specific loxodromic angle.
-
-    '''
-    return math.tan(loxodromic_angle) * (outer_waist_radius * 2)
-
-
 def check_slice_intersection(
-        intersection: Point, outer_waist_radius: float,
-        inner_radius: float, half_slice_height: float) -> Point:
+        intersection: point.Point, outer_waist_radius: float,
+        inner_radius: float, half_slice_height: float) -> point.Point:
     '''If the intersection is on the slice, return intersection, else None.'''
     on_slice = (intersection.x >= inner_radius and
                 intersection.x <= outer_waist_radius and
@@ -49,7 +39,7 @@ def check_slice_intersection(
 
 def intersect_vertical_line(
         vx: float, angle: float, dy: float, outer_waist_radius: float,
-        inner_radius: float, half_slice_height: float) -> Point:
+        inner_radius: float, half_slice_height: float) -> point.Point:
     '''Intersect a vertical line and a line.
 
     The vertical line is at x = vx.
@@ -61,14 +51,14 @@ def intersect_vertical_line(
     '''
     # Line with angle 'angle' and y-intercept dy has equation
     #   y = tan(angle) * x + dy
-    return check_slice_intersection(Point(vx, math.tan(angle) * vx + dy),
+    return check_slice_intersection(point.Point(vx, math.tan(angle) * vx + dy),
                                     outer_waist_radius, inner_radius,
                                     half_slice_height)
 
 
 def intersect_horizontal_line(
         hy: float, angle: float, dy: float, outer_waist_radius: float,
-        inner_radius: float, half_slice_height: float) -> Point:
+        inner_radius: float, half_slice_height: float) -> point.Point:
     '''Intersect a horizontal line and a line.
 
     The horizontal line is at y = hy.
@@ -81,12 +71,12 @@ def intersect_horizontal_line(
     # Line with angle 'angle' and y-intercept dy has equation
     #   y = tan(angle) * x + dy
     #   x = (y - dy) / tan(angle)
-    return check_slice_intersection(Point((hy - dy) / math.tan(angle), hy),
-                                    outer_waist_radius, inner_radius,
-                                    half_slice_height)
+    return check_slice_intersection(
+        point.Point((hy - dy) / math.tan(angle), hy),
+        outer_waist_radius, inner_radius, half_slice_height)
 
 
-class OuterInner(IntEnum):
+class OuterInner(enum.IntEnum):
     OUTER = 0
     INNER = 1
 
@@ -98,11 +88,11 @@ def slot_corners(outer_waist_radius: float, inner_radius: float,
 
     'angle' is the slot's angle, and 'width' is the slot's width.
 
-    Returns a pair of Points (P0, P1) that identify a slot's corners. The
-    origin is vertically centered between the slot's top and bottom edges. The
-    slice's left edge is at inner_radius, right edge is at outer_waist_radius,
-    top edge at half_slice_height, and bottom edge at -half_slice_height, as
-    shown in the diagram below.
+    Returns a pair of point.Points (first, second) that identify a slot's
+    corners. The origin is vertically centered between the slot's top and
+    bottom edges. The slice's left edge is at inner_radius, right edge is at
+    outer_waist_radius, top edge at half_slice_height, and bottom edge at
+    -half_slice_height, as shown in the diagram below.
 
     When outer_inner == INNER, this returns the slot's corner points on the
     inner (left) edge. When outer_inner == OUTER, this returns the slot's
@@ -193,25 +183,9 @@ def slot_corners(outer_waist_radius: float, inner_radius: float,
         second = outer_intersection(-dy)
         return [first, second]
 
-        # TODO: Handle the case where first is None or second is None.
-        # outer_edge_radius 42.43
-        # outer_waist_radius 30
-        # inner_radius 20
-        # height 80
-        # num_slices 16
-
 
 def main():
-    outer_waist_radius = 22
-    # Desired loxodromic angle, in degrees.
-    desired_angle = 45
-    height = calculate_height(outer_waist_radius=outer_waist_radius,
-                              loxodromic_angle=math.radians(desired_angle))
-    print('outer_waist_radius', outer_waist_radius)
-    print('height', height)
-    print('loxodromic angle (degrees)',
-          math.degrees(loxodromic_angle(
-              height=height, outer_waist_radius=outer_waist_radius)))
+    pass
 
 
 if __name__ == '__main__':

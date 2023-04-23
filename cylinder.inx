@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <_name>Cylinder Template Generator</_name>
+  <_name>Cylinder Templates</_name>
   <id>org.lauj.inkscape_sliceforms_cylinder</id>
 
   <dependency type="executable" location="extensions">cylinder.py</dependency>
@@ -40,7 +40,9 @@ Recommended settings:
   height: 40mm
   slices: 14
   material thickness: .25mm
-  </param>
+
+Assembly video: https://www.youtube.com/watch?v=QfBc0fR64EQ
+      </param>
     </page>
   </param>
 

@@ -52,15 +52,15 @@ def slot_corners(radius, dx, width, angle):
 
     'angle' is the slot's angle, and 'width' is the slot's width.
 
-    Returns a pair of Points (P0, P1) that identify a slot's corners. The
-    origin is vertically centered between the slot's top-left and bottom-right
-    corners.
+    Returns a pair of Points (first, second) that identify a slot's
+    corners. The origin is vertically centered between the slot's top-left and
+    bottom-right corners.
 
                 ▏
-                ▏P1
+                ▏first
                ╱
               ╱
-             ╱   P0
+             ╱   second
             ╱  ╱▏
            ╱  ╱ ▏
           ╱  ╱

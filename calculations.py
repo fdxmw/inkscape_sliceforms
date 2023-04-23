@@ -1,7 +1,7 @@
 import math
 
 
-def calculate_slot_width(material_thickness: float, lie_flat_angle: float):
+def slot_width(material_thickness: float, lie_flat_angle: float):
     '''Calculate slot width, based on thickness and desired flatness.
 
     lie_flat_angle is the maximum angle that intersecting slices can be
@@ -65,7 +65,7 @@ def calculate_slot_width(material_thickness: float, lie_flat_angle: float):
             material_thickness / math.sin(lie_flat_angle))
 
 
-def calculate_slot_angles(num_slices, loxodromic_angle):
+def slot_angles(num_slices, loxodromic_angle):
     '''Calculate slot angles in radians.
 
     These are the angles for the slots in each slice, relative to the midpoint
