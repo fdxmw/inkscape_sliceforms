@@ -23,7 +23,7 @@ If installation succeeded, there should be three new Inkscape menu items:
 1. `Extensions > Sliceforms > Hyperboloid Templates`
 1. `Extensions > Sliceforms > Torus Templates`
 
-## Usage
+## Using The Extensions
 
 Select an extension from the `Extensions > Sliceforms` menu. A dialog box should appear, with options to specify the model's dimensions. These dialog boxes have a `Help` tab with recommended settings. The default settings should work well. Generally, models are easier to assemble when they:
 
@@ -31,11 +31,31 @@ Select an extension from the `Extensions > Sliceforms` menu. A dialog box should
 1. Have thinner slices (shorter distance from a slice's left side to its right side), and
 1. Have larger central holes.
 
-Cut the templates. I use 110 lb index cardstock (200 GSM). You can print the templates on the cardstock and cut out the templates with scissors, but if you have access to a cutting machine (Cricut, Silhouette, Glowforge or similar), you can send the template patterns directly to the cutting machine.
+## Making The Models
+
+To make the models, you will need cardstock and cutting tools.
+
+### Cardstock
+
+I use 110 lb index cardstock (200 GSM), usually "Neenah Index Cardstock" purchased from Amazon.
+
+### Cutting The Cardstock
+
+If you have access to a cutting machine (Cricut, Silhouette, Glowforge or similar), you can send the template patterns directly to the cutting machine. I use a Cricut. Cutting machines work best, as the cuts are small and precise.
+- When loading an Inkscape SVG file in another program (like Cricut Design Space), double check the dimensions. For background on this debacle, see [Units In Inkscape](https://wiki.inkscape.org/wiki/Units_In_Inkscape).
+
+If you don't have access to a cutting machine, you can print the templates on the cardstock and cut them out with scissors or a knife.
+
+- Remove the fill colors (yellow and blue) from the templates, unless you want to print the fill colors.
+- When cutting with scissors, it is important to cut *all* sides of each slot. It is important to account for the thickness of the cardstock, otherwise the templates will not slot together properly.
+
+### Assemble The Model
 
 To assemble these models, refer to María García Monera's videos:
 
 * [torus assembly](https://www.youtube.com/watch?v=WVE-HeVFJ1k)
 * [cylinder assembly](https://www.youtube.com/watch?v=QfBc0fR64EQ)
+
+The videos are in Spanish, but Youtube's auto-translated captions work well.
 
 There currently is no assembly video for the hyperboloid of one sheet, but the process is very similar to the cylinder.
