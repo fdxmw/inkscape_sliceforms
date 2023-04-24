@@ -10,8 +10,9 @@ This project has template generators for three models: a torus, a cylinder, and 
 
 1. Install [Inkscape](https://inkscape.org/).
 2. Download this project's [latest release](https://github.com/fdxmw/inkscape_sliceforms/releases/download/r0.2/inkscape_sliceforms-installable-r0.2.zip).
-   - Make sure you download the `-installable-` `.zip` file, and not the `Source code` `.zip` file. The `Source code` `.zip` file is not usable on its own because it is missing the contents of the [inkscape_common](https://github.com/fdxmw/inkscape_common) submodule.
+   - If you are browsing GitHub's Releases page, be sure to download the `-installable-` `.zip` file, and not the `Source code` `.zip` file. The `Source code` `.zip` file is not usable on its own because it is missing the contents of the [inkscape_common](https://github.com/fdxmw/inkscape_common) submodule.
 3. Unzip the release into Inkscape's "User extensions" directory. The location of this directory can be found in Inkscape's Settings dialog box, under `System > User extensions`.
+   - If you previously installed an older release (`inkscape_sliceforms-installable-r0.1`), delete the old release's directory from your inkscape extensions directory, otherwise you will have multiple copies of each extension.
 4. Restart Inkscape.
 
 If installation in successful, there should be three new menu items:
