@@ -39,23 +39,23 @@
 
 Recommended settings:
 
-  outer edge radius: 60mm
-  outer waist radius: 30mm
-  inner radius: 20mm
-  height: 60mm
+  outer edge radius: 60 mm
+  outer waist radius: 30 mm
+  inner radius: 19.74 mm
+  height: 60 mm
   slices: 18
   (60° corners)
 
-  outer edge radius: 42.53mm
-  outer waist radius: 25mm
-  inner radius: 17.5mm
-  height: 42.53mm
+  outer edge radius: 59.55 mm
+  outer waist radius: 35 mm
+  inner radius: 25.80 mm
+  height: 59.55 mm
   slices: 20
   (72° corners)
 
 "corners" are where slices meet at the model's outer edge.
 
-For N° corners, set outer_edge_radius to outer_waist_radius / sin(N° / 2). To make the slices end at each intersection, 360 must by evenly divisible by N°, and the number of slices must be evenly divisible by (360 / N°).
+For N° corners, set outer_edge_radius to outer_waist_radius / sin(N° / 2). To make the slices end at each corner, 360 must by evenly divisible by N°, and the number of slices must be evenly divisible by (360 / N°).
 
 Setting the height to outer_edge_radius works well.
       </param>

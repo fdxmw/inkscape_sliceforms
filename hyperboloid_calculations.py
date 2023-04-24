@@ -1,5 +1,6 @@
 import enum
 import math
+import sys
 
 from common import point
 
@@ -185,7 +186,70 @@ def slot_corners(outer_waist_radius: float, inner_radius: float,
 
 
 def main():
-    pass
+    # Calculate hyperboloid model parameters for models where the slices touch
+    # along the outer edge.
+    def help():
+        divisors = [str(divisor) for divisor in range(1, 361)
+                    if 360 % divisor == 0]
+        print('Must specify outer_waist_radius and divisor. Valid divisors '
+              'are ', str(' '.join(divisors)))
+        exit(1)
+
+    if len(sys.argv) != 3:
+        help()
+
+    outer_waist_radius = float(sys.argv[1])
+    divisor = int(sys.argv[2])
+    if 360 % divisor != 0:
+        help()
+
+    print('divisor', divisor)
+    corner_angle = 360 / divisor
+    print('Corner angle', corner_angle)
+    print()
+
+    outer_edge_radius = (outer_waist_radius /
+                         math.sin(math.radians(corner_angle / 2)))
+    print(f'outer_edge_radius {outer_edge_radius:.2f}')
+    print(f'outer_waist_radius {outer_waist_radius}')
+
+    # Find the number of slices with slice_width closest to target_slice_width.
+    target_slice_width = 10
+    multiplier = 2
+    best_slice_width = 0
+    best_num_slices = 0
+    while True:
+        num_slices = divisor * multiplier
+
+        # Calculate distance between corners.
+        #
+        # There are num_slices corners, so the angle between corners is 2pi /
+        # num_slices.
+        angle_between_corners = 2 * math.pi / num_slices
+
+        # sin(angle_between_corners / 2) =
+        # corner_distance / 2 / outer_edge_radius
+        corner_distance = (math.sin(angle_between_corners / 2) *
+                           outer_edge_radius * 2)
+
+        # sin(pi/2 - angle_between_corners / 2) =
+        # slice_width / (corner_distance / 2)
+        slice_width = (math.sin(math.pi / 2 - angle_between_corners / 2) *
+                       (corner_distance / 2))
+
+        current_error = abs(target_slice_width - slice_width)
+        min_error = abs(target_slice_width - best_slice_width)
+        if current_error > min_error:
+            break
+        else:
+            best_slice_width = slice_width
+            best_num_slices = num_slices
+            multiplier += 1
+
+    print(f'  inner_radius {(outer_waist_radius - best_slice_width):.2f}')
+    print(f'  height {outer_edge_radius:.2f}')
+    print(f'  num_slices {best_num_slices}')
+    print(f'  (slice_width {best_slice_width:.2f})')
 
 
 if __name__ == '__main__':
