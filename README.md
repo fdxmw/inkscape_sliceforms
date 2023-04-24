@@ -15,7 +15,7 @@ This project has template generators for three models: a torus, a cylinder, and 
    - If you previously installed an older release (`inkscape_sliceforms-installable-r0.1`), delete the old release's directory from your inkscape extensions directory, otherwise you will have multiple copies of each extension.
 4. Restart Inkscape.
 
-If installation in successful, there should be three new menu items:
+If installation succeeded, there should be three new Inkscape menu items:
 
 1. `Extensions > Sliceforms > Cylinder Templates`
 1. `Extensions > Sliceforms > Hyperboloid Templates`
@@ -23,12 +23,17 @@ If installation in successful, there should be three new menu items:
 
 ## Usage
 
-Choose an extension and select the corresponding menu item. A dialog box should appear, with options to specify the model's dimensions. These dialog boxes also have a `Help` tab with recommended settings. The default settings should work well. Generally, models are easier to assemble when they:
+Select an extension from the `Extensions > Sliceforms` menu. A dialog box should appear, with options to specify the model's dimensions. These dialog boxes have a `Help` tab with recommended settings. The default settings should work well. Generally, models are easier to assemble when they:
 
 1. Are shorter in height (flatter tori, shorter cylinders and hyperboloids),
 1. Have thinner slices (shorter distance from a slice's left side to its right side), and
 1. Have larger central holes.
 
-Cut the templates. For paper I recommend using 110 lb cardstock (200 gsm). You can print the templates on the cardstock and cut out the templates with scissors, but if you have access to a cutting machine like a Cricut, Silhouette, or Glowforge, you can send the template patterns directly to the cutting machine.
+Cut the templates. I use 110 lb index cardstock (200 GSM). You can print the templates on the cardstock and cut out the templates with scissors, but if you have access to a cutting machine (Cricut, Silhouette, Glowforge or similar), you can send the template patterns directly to the cutting machine.
 
-To assemble these models, refer to María García Monera's videos: [torus assembly](https://www.youtube.com/watch?v=WVE-HeVFJ1k), [cylinder assembly](https://www.youtube.com/watch?v=QfBc0fR64EQ). There currently is no assembly video for the hyperboloid of one sheet, but the process is very similar to the cylinder.
+To assemble these models, refer to María García Monera's videos:
+
+* [torus assembly](https://www.youtube.com/watch?v=WVE-HeVFJ1k)
+* [cylinder assembly](https://www.youtube.com/watch?v=QfBc0fR64EQ)
+
+There currently is no assembly video for the hyperboloid of one sheet, but the process is very similar to the cylinder.
