@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <_name>Hyperboloid Template Generator</_name>
+  <_name>Hyperboloid Templates</_name>
   <id>org.lauj.inkscape_sliceforms_hyperboloid</id>
 
   <dependency type="executable" location="extensions">hyperboloid.py</dependency>
