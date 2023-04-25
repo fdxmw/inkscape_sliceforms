@@ -61,6 +61,8 @@ If you have access to a cutting machine (Cricut, Silhouette, Glowforge or simila
 
 > When loading an Inkscape SVG file in another program, like Cricut Design Space, always double check the dimensions. [Units In Inkscape](https://wiki.inkscape.org/wiki/Units_In_Inkscape) has more background on this debacle.
 
+> The extensions assume zero kerf. Kerf is the amount of material removed by the cutting tool. Most cutting tools appropriate for cardstock have effectively zero kerf except laser cutters. If you need to compensate for kerf, you can do it in Inkscape with [`Stroke to Path` and `Break Apart`](https://wiki.hal9k.dk/equipment/lasersaur/inkscape-kerf).
+
 #### Cutting Cardstock Manually
 
 If you don't have access to a cutting machine, you can print the templates on the cardstock and cut them out manually with scissors or a knife.
