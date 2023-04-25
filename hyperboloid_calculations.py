@@ -186,8 +186,8 @@ def slot_corners(outer_waist_radius: float, inner_radius: float,
 
 
 def main():
-    # Calculate hyperboloid model parameters for models where the slices touch
-    # along the outer edge.
+    # Calculate recommended hyperboloid model parameters, where the slices
+    # touch along the outer edge.
     def help():
         divisors = [str(divisor) for divisor in range(1, 361)
                     if 360 % divisor == 0]
@@ -203,15 +203,11 @@ def main():
     if 360 % divisor != 0:
         help()
 
-    print('divisor', divisor)
     corner_angle = 360 / divisor
-    print('Corner angle', corner_angle)
-    print()
-
     outer_edge_radius = (outer_waist_radius /
                          math.sin(math.radians(corner_angle / 2)))
-    print(f'outer_edge_radius {outer_edge_radius:.2f}')
-    print(f'outer_waist_radius {outer_waist_radius}')
+    print(f'outer edge radius: {outer_edge_radius:.2f} mm')
+    print(f'outer waist radius: {outer_waist_radius} mm')
 
     # Find the number of slices with slice_width closest to target_slice_width.
     target_slice_width = 10
@@ -246,10 +242,11 @@ def main():
             best_num_slices = num_slices
             multiplier += 1
 
-    print(f'  inner_radius {(outer_waist_radius - best_slice_width):.2f}')
-    print(f'  height {outer_edge_radius:.2f}')
-    print(f'  num_slices {best_num_slices}')
-    print(f'  (slice_width {best_slice_width:.2f})')
+    print(f'inner radius: {(outer_waist_radius - best_slice_width):.2f} mm')
+    print(f'height: {outer_edge_radius:.2f} mm')
+    print(f'slices: {best_num_slices}')
+    print(f'({corner_angle:.0f}° corners)')
+    print(f'(slice_width {best_slice_width:.2f})')
 
 
 if __name__ == '__main__':
