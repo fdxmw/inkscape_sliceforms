@@ -145,10 +145,10 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
             for intersection in reversed(intersections):
                 commands += path.arc_abs(
                     inner_radius_x, inner_radius_y,
-                    path.Size.SMALL, path.Winding.CW, intersection.inner[0])
-                commands += path.line_abs(intersection.middle[0])
+                    path.Size.SMALL, path.Winding.CW, intersection.inner[1])
                 commands += path.line_abs(intersection.middle[1])
-                commands += path.line_abs(intersection.inner[1])
+                commands += path.line_abs(intersection.middle[0])
+                commands += path.line_abs(intersection.inner[0])
         # Draw the last segment of the smaller arc, ending at the bottom point.
         bottom_left_inner = point.Point(0, vertical_gap + inner_radius_y * 2)
         commands += path.arc_abs(
