@@ -48,6 +48,9 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         pars.add_argument('--num_slices', type=int,
                           dest='num_slices', default='14',
                           help='Number of slices')
+        pars.add_argument('--slice_shape', type=str,
+                          dest='slice_shape', default='c',
+                          help='Slice shape')
         pars.add_argument('--material_thickness', type=float,
                           dest='material_thickness', default='.25',
                           help='Thickness of material')
@@ -59,8 +62,8 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         '''Convert from self.units to user units.'''
         return self.svg.unittouu(str(n) + self.units)
 
-    def render_slice(self, angles, slice_height, fill_color,
-                     outer_inner: OuterInner) -> elements.PathElement:
+    def render_c_slice(self, angles, slice_height, fill_color,
+                       outer_inner: OuterInner) -> elements.PathElement:
         # Draw a backwards 'C' shape. The 'C' opens to the left.
         #
         # The outer (rightmost) edge is an elliptical arc with horizontal
@@ -164,6 +167,150 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         element.set_path(commands)
         return element
 
+    def render_ring_slice(self, angles, slice_height, fill_color,
+                          slice_num: int) -> elements.PathElement:
+        # Draw a ring-shaped slice centered at (0, 0).
+        #
+        # The outer edge is an ellipse with horizontal radius outer_radius_x,
+        # and vertical radius outer_radius_y.
+        #
+        # The inner edge is an ellipse with horizontal radius inner_radius_x,
+        # and vertical radius inner_radius_y.
+        #
+        # vertical_gap is the vertical distance between the outer and inner
+        # edges.
+        outer_radius_x = self.outer_radius
+        outer_radius_y = slice_height / 2
+        inner_radius_x = self.inner_radius
+        inner_radius_y = self.inner_radius / math.cos(self.loxodromic_angle)
+        vertical_gap = outer_radius_y - inner_radius_y
+
+        # For each slot angle, collect three pairs of points:
+        #  outer: Where the slot intersects the slice's outer edge.
+        #  inner: Where the slot intersects the slice's inner edge.
+        # middle: Midpoints between the outer and inner intersections.
+        Intersection = collections.namedtuple(
+            'Intersection', ['outer', 'middle', 'inner'])
+        right_intersections = []
+        for angle in angles:
+            outer_points = cylinder_calculations.slot_corners(
+                outer_radius_x, outer_radius_y, angle, self.slot_width)
+
+            inner_points = cylinder_calculations.slot_corners(
+                inner_radius_x, inner_radius_y, angle, self.slot_width)
+
+            middle_points = [point.midpoint(inner_points[0], outer_points[0]),
+                             point.midpoint(inner_points[1], outer_points[1])]
+
+            right_intersections.append(Intersection(
+                outer=outer_points, middle=middle_points, inner=inner_points))
+
+        left_intersections = []
+        for right_intersection in reversed(right_intersections):
+            def mirror_points(points):
+                return [point.Point(-p.x, p.y) for p in reversed(points)]
+            left_intersections.append(Intersection(
+                outer=mirror_points(right_intersection.outer),
+                middle=mirror_points(right_intersection.middle),
+                inner=mirror_points(right_intersection.inner)))
+
+        # Start at the bottom of the outer ellipse.
+        outer_bottom = point.Point(0, outer_radius_y)
+        commands = path.move_abs(outer_bottom)
+
+        def is_outer(i):
+            '''Returns True iff slot `i` is on the outer edge.
+
+            '''
+            return i >= slice_num
+        # Draw the outer ellipse, counterclockwise from the bottom.
+        #
+        # Draw the right half of the outer ellipse.
+        for i, right_intersection in enumerate(right_intersections):
+            if not is_outer(i):
+                continue
+
+            commands += path.arc_abs(
+                outer_radius_x, outer_radius_y,
+                path.Size.SMALL, path.Winding.CCW,
+                right_intersection.outer[0])
+            commands += path.line_abs(right_intersection.middle[0])
+            commands += path.line_abs(right_intersection.middle[1])
+            commands += path.line_abs(right_intersection.outer[1])
+        # Draw the last segment of the right half of the outer ellipse, ending
+        # at the top.
+        outer_top = point.Point(0, -outer_radius_y)
+        commands += path.arc_abs(
+            outer_radius_x, outer_radius_y,
+            path.Size.SMALL, path.Winding.CCW, outer_top)
+        # Draw the left half of the outer ellipse.
+        for i, left_intersection in enumerate(left_intersections):
+            if not is_outer(i):
+                continue
+
+            commands += path.arc_abs(
+                outer_radius_x, outer_radius_y,
+                path.Size.SMALL, path.Winding.CCW, left_intersection.outer[0])
+            commands += path.line_abs(left_intersection.middle[0])
+            commands += path.line_abs(left_intersection.middle[1])
+            commands += path.line_abs(left_intersection.outer[1])
+        # Draw the last segment of the left half of the outer ellipse, ending
+        # at the bottom.
+        commands += path.arc_abs(
+            outer_radius_x, outer_radius_y,
+            path.Size.SMALL, path.Winding.CCW, outer_bottom)
+        commands += 'Z'
+
+        # Move to the bottom of the inner ellipse.
+        inner_bottom = point.Point(0, outer_radius_y - vertical_gap)
+        commands += path.move_abs(inner_bottom)
+
+        # Draw the inner ellipse, counterclockwise from the bottom.
+        #
+        # Draw the right half of the inner ellipse.
+        for i, right_intersection in enumerate(right_intersections):
+            if is_outer(i):
+                continue
+
+            commands += path.arc_abs(
+                inner_radius_x, inner_radius_y,
+                path.Size.SMALL, path.Winding.CCW, right_intersection.inner[0])
+            commands += path.line_abs(right_intersection.middle[0])
+            commands += path.line_abs(right_intersection.middle[1])
+            commands += path.line_abs(right_intersection.inner[1])
+        # Draw the last segment of the right half of the inner ellipse, ending
+        # at the top.
+        inner_top = point.Point(0, -outer_radius_y + vertical_gap)
+        commands += path.arc_abs(
+            inner_radius_x, inner_radius_y,
+            path.Size.SMALL, path.Winding.CCW, inner_top)
+        # Draw the left half of the inner ellipse.
+        for i, left_intersection in enumerate(left_intersections):
+            if is_outer(i):
+                continue
+
+            commands += path.arc_abs(
+                inner_radius_x, inner_radius_y,
+                path.Size.SMALL, path.Winding.CCW, left_intersection.inner[0])
+            commands += path.line_abs(left_intersection.middle[0])
+            commands += path.line_abs(left_intersection.middle[1])
+            commands += path.line_abs(left_intersection.inner[1])
+        # Draw the last segment of the left half of the inner ellipse, ending
+        # at the bottom.
+        commands += path.arc_abs(
+            inner_radius_x, inner_radius_y,
+            path.Size.SMALL, path.Winding.CCW, inner_bottom)
+        commands += 'Z'
+
+        element = elements.PathElement()
+        element.style = inkex.styles.Style(style={
+            'stroke-width': self.stroke_width,
+            'stroke': defaults.defaults['cut_color'],
+            'fill': fill_color,
+            'fill-rule': 'evenodd'})
+        element.set_path(commands)
+        return element
+
     def generate(self):
         self.stroke_width = str(self.svg.unittouu(
             defaults.defaults['stroke_width']))
@@ -173,6 +320,7 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         self.inner_radius = self.to_uu(self.options.inner_radius)
         self.height = self.to_uu(self.options.height)
         self.num_slices = self.options.num_slices
+        self.slice_shape = self.options.slice_shape
         self.material_thickness = self.to_uu(self.options.material_thickness)
         self.material_width = self.to_uu(self.options.material_width)
 
@@ -199,25 +347,35 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         outer_radius_y = math.sqrt(self.outer_radius * self.outer_radius +
                                    (self.height / 2) * (self.height / 2))
         inner_radius_y = self.inner_radius / math.cos(self.loxodromic_angle)
-        # Find the point where the horizontal line at inner_radius_y intersects
-        # the outer radius. That point's x-coordinate is how far we have to
-        # shift subsequent slices to the right so slices don't overlap.
-        additional_slice_width = cylinder_calculations.intersect_ellipse_line(
-            outer_radius_x, outer_radius_y, 0, inner_radius_y).x
+
         slice_height = 2 * outer_radius_y
+
+        if self.slice_shape == 'c':
+            # Find the point where the horizontal line at inner_radius_y
+            # intersects the outer radius. That point's x-coordinate is how far
+            # we have to shift subsequent slices to the right so slices don't
+            # overlap.
+            additional_slice_width = (
+                cylinder_calculations.intersect_ellipse_line(
+                    outer_radius_x, outer_radius_y, 0, inner_radius_y).x)
+            # The first slice requires the full slice width, so compensate by
+            # decreasing the material width by the width of one full slice.
+            material_width = self.material_width - outer_radius_x
+        else:
+            assert self.slice_shape == 'ring'
+            additional_slice_width = 2 * outer_radius_x
+            material_width = self.material_width - 2 * outer_radius_x
 
         # Lay out templates in rows, with self.material_width as the maximum
         # row width.
-
-        # The first slice requires the full slice width, so compensate by
-        # decreasing the material width by the width of one full slice.
-        material_width = self.material_width - outer_radius_x
+        #
         # Each additional slice requires 'slice width' additional horizontal
         # space.
         templates_per_row = (
             1 + math.floor(material_width /
                            (additional_slice_width + self.template_spacing)))
-        num_rows = math.ceil(self.num_slices / templates_per_row)
+        num_rows = math.ceil(math.ceil(self.num_slices / 2) /
+                             templates_per_row)
 
         def generate_templates(top_left, outer_inner: OuterInner):
             '''Render rows of slices starting at top_left.
@@ -228,26 +386,40 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
             Returns the point where the top left corner of the next slice
             should be rendered.
             '''
+            if self.slice_shape == 'c':
+                slice_range = range(self.num_slices)
+            else:
+                if outer_inner == OuterInner.OUTER:
+                    slice_range = range(0, self.num_slices, 2)
+                else:
+                    slice_range = range(1, self.num_slices, 2)
             templates_generated = 0
-            while templates_generated < self.num_slices:
-                top_left.x = 0
-                num_templates = min(templates_per_row,
-                                    self.num_slices - templates_generated)
-                templates_generated += num_templates
-                for _ in range(num_templates):
-                    element = self.render_slice(
+            for slice_num in slice_range:
+                if self.slice_shape == 'c':
+                    element = self.render_c_slice(
                         angles, slice_height,
                         defaults.defaults['fill_colors'][outer_inner],
                         outer_inner)
+                else:
+                    element = self.render_ring_slice(
+                        angles, slice_height,
+                        defaults.defaults['fill_colors'][outer_inner],
+                        slice_num)
 
-                    translate = transforms.Transform()
-                    translate.add_translate(top_left.x, top_left.y)
-                    element.transform = translate
-                    yield element
+                translate = transforms.Transform()
+                translate.add_translate(top_left.x, top_left.y)
+                element.transform = translate
+                yield element
 
+                templates_generated += 1
+
+                if templates_generated < templates_per_row:
                     top_left.x += (additional_slice_width +
                                    self.template_spacing)
-                top_left.y += slice_height + self.template_spacing
+                else:
+                    templates_generated = 0
+                    top_left.x = 0
+                    top_left.y += slice_height + self.template_spacing
 
         # Generate two sets of slice templates. The first set has slots on the
         # outer edge, and the second set has slots on the inner edge.

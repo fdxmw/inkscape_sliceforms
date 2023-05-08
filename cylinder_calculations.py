@@ -1,4 +1,5 @@
 import math
+import sys
 
 from common import point
 
@@ -120,10 +121,13 @@ def calculate_height(radius, loxodromic_angle):
 
 
 def main():
-    radius = 40
-    height = calculate_height(radius=radius, loxodromic_angle=math.radians(35))
-    print(height)
-    print(math.degrees(loxodromic_angle(height=height, radius=radius)))
+    radius = float(sys.argv[1])
+    angle = float(sys.argv[2])
+    height = calculate_height(radius=radius,
+                              loxodromic_angle=math.radians(angle))
+    print('height', height)
+    print('angle',
+          math.degrees(loxodromic_angle(height=height, radius=radius)))
 
 
 if __name__ == '__main__':

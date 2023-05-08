@@ -6,8 +6,8 @@
   <dependency type="executable" location="extensions">cylinder.py</dependency>
 
   <param name="tab" type="notebook">
-    <page name="options" _gui-text="Options">
-      <param name="units" _gui-text="Units" type="optiongroup">
+    <page name="options" gui-text="Options">
+      <param name="units" gui-text="Units" type="optiongroup">
 	<option value="mm">mm</option>
 	<option value="cm">cm</option>
 	<option value="in">in</option>
@@ -15,24 +15,33 @@
 
       <param name="outer_radius" type="float" precision="2"
 	     min="0.1" max="10000"
-	     _gui-text="Cylinder outer radius">35</param>
+	     gui-text="Cylinder outer radius">35</param>
       <param name="inner_radius" type="float" precision="2"
 	     min="0.1" max="10000"
-	     _gui-text="Cylinder inner radius">26</param>
+	     gui-text="Cylinder inner radius">26</param>
       <param name="height" type="float" precision="2"
 	     min="0.1" max="10000"
-	     _gui-text="Cylinder height">40</param>
+	     gui-text="Cylinder height">40</param>
       <param name="num_slices" type="int"
-	     min="1" max="1000" _gui-text="Number of slices in each direction">14</param>
+	     min="1" max="1000" gui-text="Number of slices in each direction">14</param>
+      <param name="slice_shape" gui-text="Slice shape" type="optiongroup">
+	<option value="c">C (easy to assemble)</option>
+	<option value="ring">Ring (hard to assemble)</option>
+      </param>
       <param name="material_thickness" type="float" precision="2"
-	     min="0.1" max="5" _gui-text="Thickness of material">.25</param>
+	     min="0.1" max="5" gui-text="Thickness of material">.25</param>
       <param name="material_width" type="float" precision="2"
-	     min="0.1" max="10000" _gui-text="Width of material">203</param>
+	     min="0.1" max="10000" gui-text="Width of material">203</param>
 
     </page>
-    <page name="help" _gui-text="Help">
+    <page name="help" gui-text="Help">
       <param name="help_text" type="description"
 	     xml:space="preserve">Generate sliceform templates for a cylinder.
+
+The 'Ring' slice shape option joins pairs of opposing C-shaped slices, so two
+C-shaped slices join into one ring. This results in half the number of
+slices. Models with ring slices are much more difficult to assemble than
+C-shaped slices.
 
 Recommended settings:
   outer radius: 35mm
