@@ -364,7 +364,7 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         else:
             assert self.slice_shape == 'ring'
             additional_slice_width = 2 * outer_radius_x
-            material_width = self.material_width - 2 * outer_radius_x
+            material_width = self.material_width - additional_slice_width
 
         # Lay out templates in rows, with self.material_width as the maximum
         # row width.
@@ -374,8 +374,11 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         templates_per_row = (
             1 + math.floor(material_width /
                            (additional_slice_width + self.template_spacing)))
-        num_rows = math.ceil(math.ceil(self.num_slices / 2) /
-                             templates_per_row)
+        if self.slice_shape == 'c':
+            num_slices = self.num_slices
+        else:
+            num_slices = math.ceil(self.num_slices / 2)
+        num_rows = math.ceil(num_slices / templates_per_row)
 
         def generate_templates(top_left, outer_inner: OuterInner):
             '''Render rows of slices starting at top_left.
