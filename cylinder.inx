@@ -38,10 +38,7 @@
       <param name="help_text" type="description"
 	     xml:space="preserve">Generate sliceform templates for a cylinder.
 
-The 'Ring' slice shape option joins pairs of opposing C-shaped slices, so two
-C-shaped slices join into one ring. This results in half the number of
-slices. Models with ring slices are much more difficult to assemble than
-C-shaped slices.
+The 'Ring' slice shape option joins pairs of opposing C-shaped slices, so two C-shaped slices join into one ring. This results in half the number of slices. Models with ring slices are much more difficult to assemble than models with C-shaped slices.
 
 Recommended settings:
   outer radius: 35mm
