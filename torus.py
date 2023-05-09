@@ -8,9 +8,6 @@ Assembly video: https://www.youtube.com/watch?v=WVE-HeVFJ1k
 '''
 
 import math
-import collections
-import enum
-
 import inkex
 from inkex import elements
 from inkex import transforms
@@ -20,14 +17,10 @@ from common import path
 from common import point
 
 import calculations
+import render
 import torus_calculations
 
 __version__ = '0.1'
-
-
-class OuterInner(enum.IntEnum):
-    OUTER = 0
-    INNER = 1
 
 
 class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
@@ -56,7 +49,7 @@ class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
         '''Convert from self.units to user units.'''
         return self.svg.unittouu(str(n) + self.units)
 
-    def render_slice(self, angles, fill_color, outer_inner: OuterInner,
+    def render_slice(self, angles, fill_color, outer_inner: render.OuterInner,
                      top_point) -> elements.PathElement:
         # Draw a crescent moon shape, oriented like a closing parenthesis, with
         # the crescent moon's points vertically aligned on the left.
@@ -75,79 +68,63 @@ class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
         #
         # The outer and inner edges meet at two points:
         #   top_point and (0, -top_point.y).
-        def to_display_coordinates(p: point.Point) -> point.Point:
-            '''Translate a calculated point.
-
-            Calculations assume (0, 0) is the midpoint between the crescent
-            moon's points. Translate so (0, 0) is at the top left corner of the
-            crescent moon's bounding box.
-
-            '''
-            return point.Point(p.x, p.y + self.major_radius)
-
-        # In display coordinates, higher y-values go down the screen, so the
-        # top_point becomes the bottom_point and vice versa.
-        bottom_point = to_display_coordinates(top_point)
-        top_point = to_display_coordinates(point.Point(0, -top_point.y))
+        #
+        # NOTE: The names 'top' and 'bottom' refer to display coordinates,
+        # where the positive Y-axis points downward.
+        bottom_point = top_point
+        top_point = point.Point(0, -top_point.y)
 
         # For each slot angle, collect three pairs of points:
         #  outer: Where the slot intersects the slice's outer edge.
         #  inner: Where the slot intersects the slice's inner edge.
         # middle: Midpoints between the outer and inner intersections.
-        Intersection = collections.namedtuple(
-            'Intersection', ['outer', 'middle', 'inner'])
-        intersections = []
+        forward_intersections = []
         for angle in angles:
             outer_points = torus_calculations.slot_corners(
                 self.major_radius, self.minor_radius, self.slot_width, angle)
-            outer_points = [to_display_coordinates(p) for p in outer_points]
 
             inner_points = torus_calculations.slot_corners(
                 self.major_radius, -self.minor_radius, self.slot_width, angle)
-            inner_points = [to_display_coordinates(p) for p in inner_points]
 
             middle_points = [point.midpoint(inner_points[0], outer_points[0]),
                              point.midpoint(inner_points[1], outer_points[1])]
 
-            intersections.append(Intersection(
+            forward_intersections.append(render.Intersection(
                 outer=outer_points, middle=middle_points, inner=inner_points))
 
         # Start at the bottom point.
         commands = path.move_abs(bottom_point)
 
+        def is_inner(i):
+            '''Returns True iff slot `i` is on the inner edge.'''
+            return outer_inner == render.OuterInner.INNER
+
         # Draw the outer (larger) arc of the crescent moon, counterclockwise
         # from the bottom point.
-        if outer_inner == OuterInner.OUTER:
-            for intersection in intersections:
-                commands += path.arc_abs(
-                    self.major_radius, self.major_radius,
-                    path.Size.SMALL, path.Winding.CCW, intersection.outer[0])
-                commands += path.line_abs(intersection.middle[0])
-                commands += path.line_abs(intersection.middle[1])
-                commands += path.line_abs(intersection.outer[1])
-            # Draw the last segment of the larger arc, ending at the top point.
-            commands += path.arc_abs(
-                self.major_radius, self.major_radius,
-                path.Size.SMALL, path.Winding.CCW, top_point)
+        if outer_inner == render.OuterInner.OUTER:
+            commands += render.elliptical_slotted_path(
+                intersections=forward_intersections,
+                outer_inner=render.OuterInner.OUTER,
+                winding=path.Winding.CCW, radius_x=self.major_radius,
+                radius_y=self.major_radius, end=top_point, skip=is_inner)
         else:
             commands += path.arc_abs(
                 self.major_radius, self.major_radius,
                 path.Size.LARGE, path.Winding.CCW, top_point)
 
+        def is_outer(i):
+            return not is_inner(i)
+
         # Draw the inner (smaller) arc of the crescent moon, clockwise from the
         # top point.
-        if outer_inner == OuterInner.INNER:
-            for intersection in reversed(intersections):
-                commands += path.arc_abs(
-                    self.major_radius, self.major_radius,
-                    path.Size.SMALL, path.Winding.CW, intersection.inner[1])
-                commands += path.line_abs(intersection.middle[1])
-                commands += path.line_abs(intersection.middle[0])
-                commands += path.line_abs(intersection.inner[0])
-        # Draw the last segment of the smaller arc, ending at bottom point.
-        commands += path.arc_abs(
-            self.major_radius, self.major_radius,
-            path.Size.SMALL, path.Winding.CW, bottom_point)
+        reverse_intersections = render.reverse_intersections(
+            forward_intersections)
+        commands += render.elliptical_slotted_path(
+            intersections=reverse_intersections,
+            outer_inner=render.OuterInner.INNER, winding=path.Winding.CW,
+            radius_x=self.major_radius, radius_y=self.major_radius,
+            end=bottom_point, skip=is_outer)
+
         commands += 'Z'
 
         element = elements.PathElement()
@@ -224,7 +201,8 @@ class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
 
         # Generate two rows of slice templates. The top row has slots on the
         # outer edge, and the bottom row has slots on the inner edge.
-        def generate_templates(top_left: point.Point, outer_inner: OuterInner):
+        def generate_templates(top_left: point.Point,
+                               outer_inner: render.OuterInner):
             templates_generated = 0
             while templates_generated < self.num_slices:
                 top_left.x = 0
@@ -246,10 +224,10 @@ class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
                 top_left.y += slice_height + self.template_spacing
 
         top_left = point.Point(0, 0)
-        yield from generate_templates(top_left, OuterInner.OUTER)
+        yield from generate_templates(top_left, render.OuterInner.OUTER)
         top_left = point.Point(
             0, num_rows * (slice_height + self.template_spacing))
-        yield from generate_templates(top_left, OuterInner.INNER)
+        yield from generate_templates(top_left, render.OuterInner.INNER)
 
 
 SliceformTorusGenerator().run()

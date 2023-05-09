@@ -10,7 +10,6 @@ Generates sliceform templates for a hyperboloid of one sheet.
 # https://www.youtube.com/watch?v=QfBc0fR64EQ
 
 import math
-import collections
 
 import inkex
 from inkex import elements
@@ -22,6 +21,7 @@ from common import point
 
 import calculations
 import hyperboloid_calculations
+import render
 
 __version__ = '0.1'
 
@@ -85,26 +85,11 @@ class SliceformHyperboloidGenerator(inkex.extensions.GenerateExtension):
         '''
         half_slice_height = slice_height / 2
 
-        def to_display_coordinates(p: point.Point) -> point.Point:
-            '''Translate a calculated point.
-
-            Calculations assume (0, 0) is centered at the midpoint of the
-            bounding box's left side. Translate so (0, 0) is at the top left
-            corner of the bounding box.
-
-            '''
-            if p is None:
-                return None
-            return point.Point(p.x - self.inner_radius,
-                               p.y + half_slice_height)
-
         # For each slot angle, collect three pairs of points:
         #  outer: Where the slot intersects the slice's outer edge.
         #  inner: Where the slot intersects the slice's inner edge.
         # middle: Midpoints between the outer and inner intersections.
-        Intersection = collections.namedtuple(
-            'Intersection', ['outer', 'middle', 'inner'])
-        intersections = []
+        forward_intersections = []
         for angle in angles:
             outer_points = hyperboloid_calculations.slot_corners(
                 self.outer_waist_radius, self.inner_radius, half_slice_height,
@@ -114,13 +99,10 @@ class SliceformHyperboloidGenerator(inkex.extensions.GenerateExtension):
                 # Slot does not intersect the slice.
                 continue
 
-            outer_points = [to_display_coordinates(op) for op in outer_points]
-
             inner_points = hyperboloid_calculations.slot_corners(
                 self.outer_waist_radius, self.inner_radius, half_slice_height,
                 hyperboloid_calculations.OuterInner.INNER, angle,
                 self.slot_width)
-            inner_points = [to_display_coordinates(ip) for ip in inner_points]
 
             if outer_points[0] is None:
                 assert inner_points[0] is None
@@ -137,50 +119,54 @@ class SliceformHyperboloidGenerator(inkex.extensions.GenerateExtension):
                     point.midpoint(inner_points[0], outer_points[0]),
                     point.midpoint(inner_points[1], outer_points[1])]
 
-            intersections.append(Intersection(
+            forward_intersections.append(render.Intersection(
                 outer=outer_points, middle=middle_points, inner=inner_points))
 
-        if intersections[0].outer[0] is None:
+        # NOTE: The names 'top' and 'bottom' refer to display coordinates,
+        # where the positive Y-axis points downward.
+        if forward_intersections[0].outer[0] is None:
             # The first and last intersections clip the bottom left and top
             # left corners: one slot wall intersects the slice, but the other
             # does not.
-            assert intersections[0].middle[0] is None
-            assert intersections[0].inner[0] is None
-            assert intersections[0].outer[1] is not None
-            assert intersections[0].middle[1] is not None
-            assert intersections[0].inner[1] is not None
+            assert forward_intersections[0].middle[0] is None
+            assert forward_intersections[0].inner[0] is None
+            assert forward_intersections[0].outer[1] is not None
+            assert forward_intersections[0].middle[1] is not None
+            assert forward_intersections[0].inner[1] is not None
 
-            assert intersections[-1].outer[0] is not None
-            assert intersections[-1].middle[0] is not None
-            assert intersections[-1].inner[0] is not None
-            assert intersections[-1].outer[1] is None
-            assert intersections[-1].middle[1] is None
-            assert intersections[-1].inner[1] is None
+            assert forward_intersections[-1].outer[0] is not None
+            assert forward_intersections[-1].middle[0] is not None
+            assert forward_intersections[-1].inner[0] is not None
+            assert forward_intersections[-1].outer[1] is None
+            assert forward_intersections[-1].middle[1] is None
+            assert forward_intersections[-1].inner[1] is None
 
-            bottom_left = intersections[0].outer[1]
-            top_left = intersections[-1].outer[0]
-            inner_edge_corners = [intersections[-1].inner[0],
-                                  intersections[0].inner[1]]
+            bottom_left = forward_intersections[0].outer[1]
+            top_left = forward_intersections[-1].outer[0]
+            inner_edge_corners = [forward_intersections[-1].inner[0],
+                                  forward_intersections[0].inner[1]]
 
             # Remove first and last intersections, they are handled separately.
-            intersections = intersections[1:][:-1]
+            forward_intersections = forward_intersections[1:][:-1]
         else:
-            bottom_left = point.Point(0, slice_height)
-            top_left = point.Point(0, 0)
+            bottom_left = point.Point(self.inner_radius, half_slice_height)
+            top_left = point.Point(self.inner_radius, -half_slice_height)
             inner_edge_corners = None
 
         # Start at the bottom left corner.
         commands = path.move_abs(bottom_left)
 
         # Draw the outer (bottom, right, top) edges.
-        bottom_right = point.Point(slice_width, slice_height)
-        top_right = point.Point(slice_width, 0)
+        bottom_right = point.Point(self.inner_radius + slice_width,
+                                   half_slice_height)
+        top_right = point.Point(self.inner_radius + slice_width,
+                                -half_slice_height)
 
         if outer_inner == hyperboloid_calculations.OuterInner.OUTER:
             # Draw the bottom edge.
             omit_bottom_right = False
-            for intersection in intersections:
-                if not near(intersection.outer[0].y, slice_height):
+            for intersection in forward_intersections:
+                if not near(intersection.outer[0].y, half_slice_height):
                     # No more bottom edge intersections.
                     break
                 commands += path.line_abs(intersection.outer[0])
@@ -188,7 +174,7 @@ class SliceformHyperboloidGenerator(inkex.extensions.GenerateExtension):
                 commands += path.line_abs(intersection.middle[1])
                 commands += path.line_abs(intersection.outer[1])
 
-                if not near(intersection.outer[1].y, slice_height):
+                if not near(intersection.outer[1].y, half_slice_height):
                     # The slot intersected the bottom_right corner, so don't
                     # draw the bottom_right corner.
                     omit_bottom_right = True
@@ -200,14 +186,16 @@ class SliceformHyperboloidGenerator(inkex.extensions.GenerateExtension):
             # Draw the right edge.
             found_right_edge = False
             omit_top_right = False
-            for intersection in intersections:
+            for intersection in forward_intersections:
                 if not found_right_edge:
-                    if not near(intersection.outer[0].x, slice_width):
+                    if not near(intersection.outer[0].x,
+                                self.inner_radius + slice_width):
                         continue
                     else:
                         found_right_edge = True
 
-                if not near(intersection.outer[0].x, slice_width):
+                if not near(intersection.outer[0].x,
+                            self.inner_radius + slice_width):
                     # No more right edge intersections.
                     break
                 commands += path.line_abs(intersection.outer[0])
@@ -215,7 +203,8 @@ class SliceformHyperboloidGenerator(inkex.extensions.GenerateExtension):
                 commands += path.line_abs(intersection.middle[1])
                 commands += path.line_abs(intersection.outer[1])
 
-                if not near(intersection.outer[1].x, slice_width):
+                if not near(intersection.outer[1].x,
+                            self.inner_radius + slice_width):
                     # The slot intersected the top_right corner, so don't
                     # draw the top_right corner.
                     omit_top_right = True
@@ -226,9 +215,9 @@ class SliceformHyperboloidGenerator(inkex.extensions.GenerateExtension):
 
             # Draw the top edge.
             found_top_edge = False
-            for intersection in intersections:
+            for intersection in forward_intersections:
                 if not found_top_edge:
-                    if not near(intersection.outer[0].y, 0):
+                    if not near(intersection.outer[0].y, -half_slice_height):
                         continue
                     else:
                         found_top_edge = True
@@ -255,12 +244,14 @@ class SliceformHyperboloidGenerator(inkex.extensions.GenerateExtension):
         if inner_edge_corners is not None:
             commands += path.line_abs(inner_edge_corners[0])
 
+        reversed_intersections = render.reverse_intersections(
+            forward_intersections)
         if outer_inner == hyperboloid_calculations.OuterInner.INNER:
-            for intersection in reversed(intersections):
-                commands += path.line_abs(intersection.inner[1])
-                commands += path.line_abs(intersection.middle[1])
-                commands += path.line_abs(intersection.middle[0])
+            for intersection in reversed_intersections:
                 commands += path.line_abs(intersection.inner[0])
+                commands += path.line_abs(intersection.middle[0])
+                commands += path.line_abs(intersection.middle[1])
+                commands += path.line_abs(intersection.inner[1])
 
         if inner_edge_corners is not None:
             commands += path.line_abs(inner_edge_corners[1])
