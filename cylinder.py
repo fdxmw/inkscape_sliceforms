@@ -55,23 +55,9 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         '''Convert from self.units to user units.'''
         return self.svg.unittouu(str(n) + self.units)
 
-    def render_c_slice(self, angles, slice_height, fill_color,
-                       outer_inner: render.OuterInner) -> elements.PathElement:
-        # Draw a backwards 'C' shape. The 'C' opens to the left.
-        #
-        # The outer (rightmost) edge is an elliptical arc with horizontal
-        # radius outer_radius_x, and vertical radius outer_radius_y. The
-        # ellipse is centered at the midpoint of the bounding box's left
-        # side. The arc only uses the portion of the ellipse with non-negative
-        # x.
-        #
-        # The inner (leftmost) edge is an elliptical arc with horizontal radius
-        # inner_radius_x, and vertical radius inner_radius_y. The ellipse is
-        # centered at the midpoint of the bounding box's left side. The arc
-        # only uses the portion of the ellipse with non-negative x.
-        #
-        # The outer and inner edges are connected by two vertical lines along
-        # the bounding box's left side
+    def render_slice(self, slice_shape: str, angles, slice_height, fill_color,
+                     outer_inner: render.OuterInner,
+                     slice_num: int) -> elements.PathElement:
         outer_radius_x = self.outer_radius
         outer_radius_y = slice_height / 2
         inner_radius_x = self.inner_radius
@@ -99,126 +85,106 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
         outer_bottom = point.Point(0, outer_radius_y)
         commands = path.move_abs(outer_bottom)
 
-        def is_inner(i):
-            return outer_inner == render.OuterInner.INNER
+        if slice_shape == 'c':
+            # Draw a backwards 'C' shape. The 'C' opens to the left.
+            #
+            # The outer (rightmost) edge is an elliptical arc with horizontal
+            # radius outer_radius_x, and vertical radius outer_radius_y. The
+            # ellipse is centered at the midpoint of the bounding box's left
+            # side. The arc only uses the portion of the ellipse with
+            # non-negative x.
+            #
+            # The inner (leftmost) edge is an elliptical arc with horizontal
+            # radius inner_radius_x, and vertical radius inner_radius_y. The
+            # ellipse is centered at the midpoint of the bounding box's left
+            # side. The arc only uses the portion of the ellipse with
+            # non-negative x.
+            #
+            # The outer and inner edges are connected by two vertical lines
+            # along the bounding box's left side
+            def is_inner(i):
+                return outer_inner == render.OuterInner.INNER
 
-        # Draw the outer edge, counterclockwise from the bottom.
-        #
-        # NOTE: The names 'top' and 'bottom' refer to display coordinates,
-        # where the positive Y-axis points downward.
-        outer_top = point.Point(0, -outer_radius_y)
-        commands += render.elliptical_slotted_path(
-            intersections=forward_intersections,
-            outer_inner=render.OuterInner.OUTER, winding=path.Winding.CCW,
-            radius_x=outer_radius_x, radius_y=outer_radius_y,
-            end=outer_top, skip=is_inner)
+            # Draw the outer edge, counterclockwise from the bottom.
+            #
+            # NOTE: The names 'top' and 'bottom' refer to display coordinates,
+            # where the positive Y-axis points downward.
+            outer_top = point.Point(0, -outer_radius_y)
+            commands += render.elliptical_slotted_path(
+                intersections=forward_intersections,
+                outer_inner=render.OuterInner.OUTER, winding=path.Winding.CCW,
+                radius_x=outer_radius_x, radius_y=outer_radius_y,
+                end=outer_top, skip=is_inner)
 
-        inner_top = point.Point(0, -inner_radius_y)
-        commands += path.line_abs(inner_top)
+            inner_top = point.Point(0, -inner_radius_y)
+            commands += path.line_abs(inner_top)
 
-        def is_outer(i):
-            return not is_inner(i)
+            def is_outer(i):
+                return not is_inner(i)
 
-        # Draw the inner edge, clockwise from the top.
-        reverse_intersections = render.reverse_intersections(
-            forward_intersections)
-        inner_bottom = point.Point(0, inner_radius_y)
-        commands += render.elliptical_slotted_path(
-            intersections=reverse_intersections,
-            outer_inner=render.OuterInner.INNER, winding=path.Winding.CW,
-            radius_x=inner_radius_x, radius_y=inner_radius_y,
-            end=inner_bottom, skip=is_outer)
+            # Draw the inner edge, clockwise from the top.
+            reverse_intersections = render.reverse_intersections(
+                forward_intersections)
+            inner_bottom = point.Point(0, inner_radius_y)
+            commands += render.elliptical_slotted_path(
+                intersections=reverse_intersections,
+                outer_inner=render.OuterInner.INNER, winding=path.Winding.CW,
+                radius_x=inner_radius_x, radius_y=inner_radius_y,
+                end=inner_bottom, skip=is_outer)
+        elif slice_shape == 'ring':
+            # Draw a ring-shaped slice centered at (0, 0).
+            #
+            # The outer edge is an ellipse with horizontal radius
+            # outer_radius_x, and vertical radius outer_radius_y.
+            #
+            # The inner edge is an ellipse with horizontal radius
+            # inner_radius_x, and vertical radius inner_radius_y.
+            def is_inner(i):
+                '''Returns True iff slot `i` is on the inner edge.'''
+                return i >= slice_num
 
-        commands += 'Z'
+            right_intersections = forward_intersections
+            left_intersections = render.mirror_intersections(
+                render.reverse_intersections(forward_intersections))
 
-        element = elements.PathElement()
-        element.style = inkex.styles.Style(style={
-            'stroke-width': self.stroke_width,
-            'stroke': defaults.defaults['cut_color'],
-            'fill': fill_color})
-        element.set_path(commands)
-        return element
+            # Draw the right half of the outer ellipse.
+            outer_top = point.Point(0, -outer_radius_y)
+            commands += render.elliptical_slotted_path(
+                intersections=right_intersections,
+                outer_inner=render.OuterInner.OUTER, winding=path.Winding.CCW,
+                radius_x=outer_radius_x, radius_y=outer_radius_y,
+                end=outer_top, skip=is_inner)
 
-    def render_ring_slice(self, angles, slice_height, fill_color,
-                          slice_num: int) -> elements.PathElement:
-        # Draw a ring-shaped slice centered at (0, 0).
-        #
-        # The outer edge is an ellipse with horizontal radius outer_radius_x,
-        # and vertical radius outer_radius_y.
-        #
-        # The inner edge is an ellipse with horizontal radius inner_radius_x,
-        # and vertical radius inner_radius_y.
-        outer_radius_x = self.outer_radius
-        outer_radius_y = slice_height / 2
-        inner_radius_x = self.inner_radius
-        inner_radius_y = self.inner_radius / math.cos(self.loxodromic_angle)
+            # Draw the left half of the outer ellipse.
+            commands += render.elliptical_slotted_path(
+                intersections=left_intersections,
+                outer_inner=render.OuterInner.OUTER, winding=path.Winding.CCW,
+                radius_x=outer_radius_x, radius_y=outer_radius_y,
+                end=outer_bottom, skip=is_inner)
+            commands += 'Z'
 
-        # For each slot angle, collect three pairs of points:
-        #  outer: Where the slot intersects the slice's outer edge.
-        #  inner: Where the slot intersects the slice's inner edge.
-        # middle: Midpoints between the outer and inner intersections.
-        right_intersections = []
-        for angle in angles:
-            outer_points = cylinder_calculations.slot_corners(
-                outer_radius_x, outer_radius_y, angle, self.slot_width)
+            # Move to the bottom of the inner ellipse.
+            inner_bottom = point.Point(0, inner_radius_y)
+            commands += path.move_abs(inner_bottom)
 
-            inner_points = cylinder_calculations.slot_corners(
-                inner_radius_x, inner_radius_y, angle, self.slot_width)
+            def is_outer(i):
+                return not is_inner(i)
 
-            middle_points = [point.midpoint(inner_points[0], outer_points[0]),
-                             point.midpoint(inner_points[1], outer_points[1])]
+            # Draw the right half of the inner ellipse.
+            inner_top = point.Point(0, -inner_radius_y)
+            commands += render.elliptical_slotted_path(
+                intersections=right_intersections,
+                outer_inner=render.OuterInner.INNER, winding=path.Winding.CCW,
+                radius_x=inner_radius_x, radius_y=inner_radius_y,
+                end=inner_top, skip=is_outer)
 
-            right_intersections.append(render.Intersection(
-                outer=outer_points, middle=middle_points, inner=inner_points))
+            # Draw the left half of the inner ellipse.
+            commands += render.elliptical_slotted_path(
+                intersections=left_intersections,
+                outer_inner=render.OuterInner.INNER, winding=path.Winding.CCW,
+                radius_x=inner_radius_x, radius_y=inner_radius_y,
+                end=inner_bottom, skip=is_outer)
 
-        left_intersections = render.mirror_intersections(
-            render.reverse_intersections(right_intersections))
-
-        # Start at the bottom of the outer ellipse.
-        outer_bottom = point.Point(0, outer_radius_y)
-        commands = path.move_abs(outer_bottom)
-
-        def is_inner(i):
-            '''Returns True iff slot `i` is on the inner edge.'''
-            return i >= slice_num
-
-        # Draw the right half of the outer ellipse.
-        outer_top = point.Point(0, -outer_radius_y)
-        commands += render.elliptical_slotted_path(
-            intersections=right_intersections,
-            outer_inner=render.OuterInner.OUTER, winding=path.Winding.CCW,
-            radius_x=outer_radius_x, radius_y=outer_radius_y,
-            end=outer_top, skip=is_inner)
-
-        # Draw the left half of the outer ellipse.
-        commands += render.elliptical_slotted_path(
-            intersections=left_intersections,
-            outer_inner=render.OuterInner.OUTER, winding=path.Winding.CCW,
-            radius_x=outer_radius_x, radius_y=outer_radius_y,
-            end=outer_bottom, skip=is_inner)
-        commands += 'Z'
-
-        # Move to the bottom of the inner ellipse.
-        inner_bottom = point.Point(0, inner_radius_y)
-        commands += path.move_abs(inner_bottom)
-
-        def is_outer(i):
-            return not is_inner(i)
-
-        # Draw the right half of the inner ellipse.
-        inner_top = point.Point(0, -inner_radius_y)
-        commands += render.elliptical_slotted_path(
-            intersections=right_intersections,
-            outer_inner=render.OuterInner.INNER, winding=path.Winding.CCW,
-            radius_x=inner_radius_x, radius_y=inner_radius_y,
-            end=inner_top, skip=is_outer)
-
-        # Draw the left half of the inner ellipse.
-        commands += render.elliptical_slotted_path(
-            intersections=left_intersections,
-            outer_inner=render.OuterInner.INNER, winding=path.Winding.CCW,
-            radius_x=inner_radius_x, radius_y=inner_radius_y,
-            end=inner_bottom, skip=is_outer)
         commands += 'Z'
 
         element = elements.PathElement()
@@ -317,16 +283,10 @@ class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
                     slice_range = range(1, self.num_slices, 2)
             templates_generated = 0
             for slice_num in slice_range:
-                if self.slice_shape == 'c':
-                    element = self.render_c_slice(
-                        angles, slice_height,
-                        defaults.defaults['fill_colors'][outer_inner],
-                        outer_inner)
-                else:
-                    element = self.render_ring_slice(
-                        angles, slice_height,
-                        defaults.defaults['fill_colors'][outer_inner],
-                        slice_num)
+                element = self.render_slice(
+                    self.slice_shape, angles, slice_height,
+                    defaults.defaults['fill_colors'][outer_inner],
+                    outer_inner, slice_num)
 
                 translate = transforms.Transform()
                 translate.add_translate(top_left.x, top_left.y)

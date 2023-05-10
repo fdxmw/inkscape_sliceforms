@@ -58,6 +58,8 @@ Recommended settings:
 For N° corners, set outer_edge_radius to outer_waist_radius / sin(N° / 2). To make the slices end at each corner, 360 must by evenly divisible by N°, and the number of slices must be evenly divisible by (360 / N°).
 
 Setting the height to outer_edge_radius works well.
+
+There is no assembly video for this model, but the process is similar to the cylinder model: https://www.youtube.com/watch?v=QfBc0fR64EQ
       </param>
     </page>
   </param>
