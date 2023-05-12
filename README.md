@@ -7,9 +7,9 @@ A collection of [Inkscape](https://inkscape.org/) [extensions](https://inkscape.
 ![hyperboloids](images/hyperboloids.jpg)
 ![truncated spheres](images/truncated_spheres.jpg)
 
-This project has template generators for four models: a torus, a cylinder a hyperboloid of one sheet, and a truncated sphere. All models are based on the paper [Building a torus with Villarceau sections](http://www.heldermann-verlag.de/jgg/jgg15/j15h1mone.pdf) by María García Monera and Juan Monterde, and [sample templates](https://www.uv.es/monera2/) published by María García Monera.
+This project has template generators for four sliceform models: a torus, a cylinder, a hyperboloid of one sheet, and a truncated sphere. All models are based on the paper [Building a torus with Villarceau sections](http://www.heldermann-verlag.de/jgg/jgg15/j15h1mone.pdf) by María García Monera and Juan Monterde, and [sample templates](https://www.uv.es/monera2/) published by María García Monera.
 
-## Installing The Extensions
+## Installing the extensions
 
 1. Install [Inkscape](https://inkscape.org/). The extensions are tested with Inkscape 1.2.2.
 2. Download this project's [latest release](https://github.com/fdxmw/inkscape_sliceforms/releases/download/r0.3/inkscape_sliceforms-installable-r0.3.zip).
@@ -25,11 +25,11 @@ If installation succeeded, you should see four new Inkscape menu items:
 1. `Extensions > Sliceforms > Torus Templates`
 1. `Extensions > Sliceforms > Truncated Sphere Templates`
 
-## Using The Extensions
+## Using the extensions
 
 Select an extension from the `Extensions > Sliceforms` menu. A dialog box should appear, with options to specify the model's dimensions. These dialog boxes have a `Help` tab with recommended settings. The default settings should work well for 110lb (200GSM) cardstock.
 
-### Choosing Model Dimensions
+### Choosing model dimensions
 
 Generally, models are easier to assemble when they are shorter, use thinner slices, and have larger central holes:
 
@@ -45,7 +45,7 @@ All extensions have these two parameters:
 
 The cylinder and truncated sphere models have a 'Slice shape' option. The 'C' option much easier to assemble. The 'Ring' option is more difficult to assemble, because each slice has a unique pattern of slots, and the slices must be assembled in a specific order, and it is much easier to accidentally tear the paper during assembly. Unfortunately I have not yet found time to document the assembly process for ring-shaped slices. Models with ring-shaped slices are much more rigid than models with C-shaped slices. The green and white truncated sphere in the images above was assembled from ring-shaped slices; all the other cylinders and spheres were assembled from C-shaped slices.
 
-## Making Slices
+## Making slices
 
 To make a model, you will need cardstock and a cutting tool.
 
@@ -53,13 +53,13 @@ To make a model, you will need cardstock and a cutting tool.
 
 I use 110 lb index cardstock (200 GSM), usually "Neenah Index Cardstock" from Amazon.com. You will need to slightly bend the cardstock during assembly, so extremely rigid materials like solid wood or metal will not work.
 
-### Cutting Cardstock
+### Cutting cardstock
 
 For a stronger model, arrange the templates on the cardstock so most of the slots are perpendicular to the grain of the cardstock. The extensions assume that the grain runs vertically.
 
 > For example, the grain for Neenah cardstock runs in the longer dimension of the cardstock. The extensions assume the grain is vertical, so orient the cardstock with the longer dimension vertical ("portrait").
 
-#### Cutting Cardstock With A Machine
+#### Cutting cardstock with a machine
 
 If you have access to a cutting machine, like a Cricut, Silhouette, Glowforge or similar, you can send the templates directly to the cutting machine. I use a Cricut. Cutting machines work best, as the cuts are small and precision is important.
 
@@ -67,7 +67,7 @@ If you have access to a cutting machine, like a Cricut, Silhouette, Glowforge or
 
 > The extensions assume zero kerf. Kerf is the amount of material removed by the cutting tool. Most cutting tools appropriate for cardstock have effectively zero kerf except laser cutters. If you need to compensate for kerf, you can do it in Inkscape by [combining the `Stroke to Path` and `Break Apart` tools](https://wiki.hal9k.dk/equipment/lasersaur/inkscape-kerf).
 
-#### Cutting Cardstock Manually
+#### Cutting cardstock manually
 
 If you don't have access to a cutting machine, you can print the templates on the cardstock and cut them out manually with scissors or a knife.
 
@@ -75,7 +75,7 @@ If you don't have access to a cutting machine, you can print the templates on th
 
 > When cutting manually, it is important to cut *all* sides of each slot. Specifically, you can not make only one cut in the middle of the slot. The slot width accounts for the thickness of the cardstock, and if the slot width is incorrect the slices will not fit together properly.
 
-## Assembling Slices
+## Assembling the slices
 
 To assemble these models, refer to María García Monera's videos:
 
@@ -84,6 +84,6 @@ To assemble these models, refer to María García Monera's videos:
 
 The videos are in Spanish, but Youtube's auto-translated captions work well.
 
-There currently is no assembly video for the hyperboloid of one sheet or the truncated sphere, but the processes are very similar to the cylinder.
+There currently is no assembly video for the hyperboloid of one sheet or the truncated sphere, but the assembly processes are very similar to the cylinder.
 
-In the assembly videos, María recommends setting aside two slices of the outer templates, and adding these two outer slices to the model after expanding the model from a flat stack of slices to a three-dimensional model. I've found it helps to set aside as many outer slices as possible. With `N` slices, try setting aside `(N - 2) / 2` outer slices.
+In the assembly videos, María recommends setting aside two slices of the outer templates, expanding the model from a flat stack of slices to a three-dimensional model, then finally adding the two set-aside outer templates to the three-dimensional model. I've found it helps to set aside as many outer slices as possible. With `N` slices, try setting aside `(N - 2) / 2` outer slices.
