@@ -20,7 +20,7 @@ import calculations
 import cylinder_calculations
 import render
 
-__version__ = '0.1'
+__version__ = '0.3'
 
 
 class SliceformCylinderGenerator(inkex.extensions.GenerateExtension):
