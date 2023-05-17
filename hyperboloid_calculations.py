@@ -243,7 +243,7 @@ def main():
             multiplier += 1
 
     print(f'inner radius: {(outer_waist_radius - best_slice_width):.2f} mm')
-    print(f'height: {outer_edge_radius:.2f} mm')
+    print(f'height: {1.25 * outer_edge_radius:.2f} mm')
     print(f'slices: {best_num_slices}')
     print(f'({corner_angle:.0f}° corners)')
     print(f'(slice_width {best_slice_width:.2f})')
