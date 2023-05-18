@@ -19,6 +19,24 @@ class TestCalculations(unittest.TestCase):
         for actual, expected in zip(actual_angles, expected_angles):
             self.assertAlmostEqual(actual, expected, places=1)
 
+    def test_slot_width(self):
+        for material_thickness in range(10):
+            actual_width = calculations.slot_width(material_thickness,
+                                                   math.radians(90))
+            self.assertAlmostEqual(actual_width, material_thickness)
+
+            actual_width = calculations.slot_width(material_thickness,
+                                                   math.radians(45))
+            self.assertAlmostEqual(
+                actual_width,
+                material_thickness + math.sqrt(2) * material_thickness)
+
+            actual_width = calculations.slot_width(material_thickness,
+                                                   math.radians(60))
+            self.assertAlmostEqual(
+                actual_width,
+                3 * material_thickness / math.sqrt(3))
+
 
 if __name__ == '__main__':
     unittest.main()

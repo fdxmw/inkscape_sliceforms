@@ -193,7 +193,7 @@ def main():
                     if 360 % divisor == 0]
         print('Must specify outer_waist_radius and divisor. Valid divisors '
               'are ', str(' '.join(divisors)))
-        exit(1)
+        sys.exit(1)
 
     if len(sys.argv) != 3:
         help()

@@ -8,6 +8,10 @@ def main():
     top_radius is the radius of the truncated sphere's top (and bottom) hole.
 
     """
+    if len(sys.argv) < 4:
+        print('Must specify outer_radius, inner_radius, top_radius.')
+        sys.exit(1)
+
     outer_radius = float(sys.argv[1])
     inner_radius = float(sys.argv[2])
     top_radius = float(sys.argv[3])

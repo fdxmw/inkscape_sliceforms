@@ -17,7 +17,7 @@ def slot_width(material_thickness: float, lie_flat_angle: float):
              ▕    ╱   ╱  lie_flat_angle
    top       ▕ b ╱c  ╱       ▁▁
    ▔▔▔▔▔▔▔▔▔▔▔▔▔╱▔▔▔╱▔▔▔▔▔▔  ▕
-              d╱   ╱         ▕ material_thickness
+               ╱d  ╱         ▕ material_thickness
    bottom     ╱   ╱          ▕
    ▔▔▔▔▔▔▔▔▔▔╱   ╱▔▔▔▔▔▔▔▔▔  ▔▔
         left╱   ╱right
@@ -46,7 +46,7 @@ def slot_width(material_thickness: float, lie_flat_angle: float):
     #   c = material_thickness / sin(lie_flat_angle)  [Equation 0]
     #
     # Construct a right triangle surrounding d, with the diagonal line segment
-    # d as the hypotenuse, and the right angle in the top left:
+    # d as the hypotenuse, and the right angle in the bottom right:
     #
     #   tan(lie_flat_angle) = material_thickness / b
     #   tan(lie_flat_angle) = material_thickness / (slot_width - c)
@@ -61,6 +61,7 @@ def slot_width(material_thickness: float, lie_flat_angle: float):
     #                                         tan(lie_flat_angle))
     #   slot_width = (material_thickness / tan(lie_flat_angle) +
     #                 material_thickness / sin(lie_flat_angle))
+    lie_flat_angle = lie_flat_angle % math.pi / 2
     return (material_thickness / math.tan(lie_flat_angle) +
             material_thickness / math.sin(lie_flat_angle))
 
