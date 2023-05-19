@@ -32,7 +32,19 @@ class TestCalculations(unittest.TestCase):
                 material_thickness + math.sqrt(2) * material_thickness)
 
             actual_width = calculations.slot_width(material_thickness,
+                                                   math.radians(180 - 45))
+            self.assertAlmostEqual(
+                actual_width,
+                material_thickness + math.sqrt(2) * material_thickness)
+
+            actual_width = calculations.slot_width(material_thickness,
                                                    math.radians(60))
+            self.assertAlmostEqual(
+                actual_width,
+                3 * material_thickness / math.sqrt(3))
+
+            actual_width = calculations.slot_width(material_thickness,
+                                                   math.radians(180 - 60))
             self.assertAlmostEqual(
                 actual_width,
                 3 * material_thickness / math.sqrt(3))

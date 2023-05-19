@@ -61,7 +61,9 @@ def slot_width(material_thickness: float, lie_flat_angle: float):
     #                                         tan(lie_flat_angle))
     #   slot_width = (material_thickness / tan(lie_flat_angle) +
     #                 material_thickness / sin(lie_flat_angle))
-    lie_flat_angle = lie_flat_angle % math.pi / 2
+    assert lie_flat_angle < math.pi
+    if lie_flat_angle > math.pi / 2:
+        lie_flat_angle = math.pi - lie_flat_angle
     return (material_thickness / math.tan(lie_flat_angle) +
             material_thickness / math.sin(lie_flat_angle))
 
