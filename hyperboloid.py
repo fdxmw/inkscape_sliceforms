@@ -23,7 +23,7 @@ import calculations
 import hyperboloid_calculations
 import render
 
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 epsilon = 0.000001
 

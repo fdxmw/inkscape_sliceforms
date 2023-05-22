@@ -20,7 +20,7 @@ import calculations
 import render
 import torus_calculations
 
-__version__ = '0.3'
+__version__ = '0.3.1'
 
 
 class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
