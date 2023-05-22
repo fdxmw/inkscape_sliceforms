@@ -43,7 +43,7 @@ All extensions have these two parameters:
 1. Width of material. This setting just helps you use material more efficiently. The material width determines how many template copies placed in a row, before starting a new row. Note that this is the *usable* material width, which is smaller than the actual material width.
    > For example, with a Cricut cutting machine it is best to avoid cutting within .25″ of the material's edge, so the usable width of a 8.5″ x 11″ sheet of cardstock is actually 8″ (8.5″ - .25″ - 25.″).
 
-The cylinder and truncated sphere models have a 'Slice shape' option. The 'C' option much easier to assemble. The 'Ring' option is more difficult to assemble, because each slice has a unique pattern of slots, and the slices must be assembled in a specific order, and it is much easier to accidentally tear the paper during assembly. Unfortunately I have not yet found time to document the assembly process for ring-shaped slices. Models with ring-shaped slices are much more rigid than models with C-shaped slices. The green and white truncated sphere in the images above was assembled from ring-shaped slices; all the other cylinders and spheres were assembled from C-shaped slices.
+The cylinder and truncated sphere models have a 'Slice shape' option. The 'C' option much easier to assemble. The 'Ring' option is more difficult to assemble, because each slice has a unique pattern of slots, and the slices must be assembled in a specific order, and it is much easier to accidentally tear the paper during assembly. The green and white truncated sphere in the images above was assembled from ring-shaped slices; all the other cylinders and spheres were assembled from C-shaped slices.
 
 ## Making slices
 
@@ -87,3 +87,5 @@ The videos are in Spanish, but Youtube's auto-translated captions work well.
 There currently is no assembly video for the hyperboloid of one sheet or the truncated sphere, but the assembly processes are very similar to the cylinder.
 
 In the assembly videos, María recommends setting aside two slices of the outer templates, expanding the model from a flat stack of slices to a three-dimensional model, then finally adding the two set-aside outer templates to the three-dimensional model. I've found it helps to set aside as many outer slices as possible. With `N` slices, try setting aside `(N - 2) / 2` outer slices.
+
+Models with ring slices follow a different assembly process; here is [a basic guide](ring-assembly.md).

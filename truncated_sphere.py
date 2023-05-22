@@ -130,9 +130,9 @@ class SliceformTruncatedSphereGenerator(inkex.extensions.GenerateExtension):
             #
             # The inner edge is an ellipse with horizontal radius
             # inner_radius_x, and vertical radius inner_radius_y.
-            def is_inner(i):
-                '''Returns True iff slot `i` is on the inner edge.'''
-                return i >= slice_num
+            def is_outer(i):
+                '''Returns True iff slot `i` is on the outer edge.'''
+                return i < slice_num
 
             right_intersections = forward_intersections
             left_intersections = render.mirror_intersections(
@@ -144,22 +144,22 @@ class SliceformTruncatedSphereGenerator(inkex.extensions.GenerateExtension):
                 intersections=right_intersections,
                 outer_inner=render.OuterInner.OUTER, winding=path.Winding.CCW,
                 radius_x=self.outer_radius, radius_y=self.outer_radius,
-                end=outer_top, skip=is_inner)
+                end=outer_top, skip=is_outer)
 
             # Draw the left half of the outer ellipse.
             commands += render.elliptical_slotted_path(
                 intersections=left_intersections,
                 outer_inner=render.OuterInner.OUTER, winding=path.Winding.CCW,
                 radius_x=self.outer_radius, radius_y=self.outer_radius,
-                end=outer_bottom, skip=is_inner)
+                end=outer_bottom, skip=is_outer)
             commands += 'Z'
 
             # Move to the bottom of the inner ellipse.
             inner_bottom = point.Point(0, self.inner_radius)
             commands += path.move_abs(inner_bottom)
 
-            def is_outer(i):
-                return not is_inner(i)
+            def is_inner(i):
+                return not is_outer(i)
 
             # Draw the right half of the inner ellipse.
             inner_top = point.Point(0, -self.inner_radius)
@@ -167,14 +167,14 @@ class SliceformTruncatedSphereGenerator(inkex.extensions.GenerateExtension):
                 intersections=right_intersections,
                 outer_inner=render.OuterInner.INNER, winding=path.Winding.CCW,
                 radius_x=self.inner_radius, radius_y=self.inner_radius,
-                end=inner_top, skip=is_outer)
+                end=inner_top, skip=is_inner)
 
             # Draw the left half of the inner ellipse.
             commands += render.elliptical_slotted_path(
                 intersections=left_intersections,
                 outer_inner=render.OuterInner.INNER, winding=path.Winding.CCW,
                 radius_x=self.inner_radius, radius_y=self.inner_radius,
-                end=inner_bottom, skip=is_outer)
+                end=inner_bottom, skip=is_inner)
 
         commands += 'Z'
 
