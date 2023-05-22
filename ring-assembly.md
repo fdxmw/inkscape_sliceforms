@@ -1,6 +1,6 @@
 # Assembling models with ring slices
 
-Models with ring slices are very difficult to assemble. It helps to assemble the same model with 'C'-shaped slices first, to get a better sense of how the pieces fit together. The following pictures show the assembly process for a truncated sphere model, using [these sample templates](images.ring-slices.pdf).
+Models with ring slices are very difficult to assemble. It helps to assemble the same model with 'C'-shaped slices first, to get a better sense of how the pieces fit together. The following pictures show the assembly process for a truncated sphere model, using [these sample templates](images/ring-slices.pdf).
 
 Note how the slice templates are numbered: Yellow slices have even numbers, starting from 0, and blue slices have odd numbers starting from 1. There are 8 slices, numbered 0-7, and each slice has a unique number.
 
