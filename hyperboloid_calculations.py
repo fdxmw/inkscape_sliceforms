@@ -193,6 +193,11 @@ def main():
                     if 360 % divisor == 0]
         print('Must specify outer_waist_radius and divisor. Valid divisors '
               'are ', str(' '.join(divisors)))
+        print('Recommended settings (outer_waist_radius, divisor):')
+        print('  42.5 4')
+        print('  35   5')
+        print('  30   6')
+        print('  27.5 8')
         sys.exit(1)
 
     if len(sys.argv) != 3:
@@ -235,7 +240,7 @@ def main():
 
         current_error = abs(target_slice_width - slice_width)
         min_error = abs(target_slice_width - best_slice_width)
-        if current_error > min_error:
+        if best_slice_width > 0 and current_error > min_error:
             break
         else:
             best_slice_width = slice_width
