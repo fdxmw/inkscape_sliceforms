@@ -156,12 +156,19 @@ class SliceformTorusGenerator(inkex.extensions.GenerateExtension):
         assert self.major_radius > self.minor_radius, \
             'Error: Major radius must be larger than minor radius'
 
-        # First equation on page 3 from
+        # loxodromic_angle is the slice angle, relative to the base of the
+        # torus.
+        #
+        # Note: Slice edges are tangent to the surface of the torus. This
+        # implies that, if you look at a cross-section, the tip of each slice
+        # contacts the surface at right angles, so the tip contact points are
+        # *not* at the highest and lowest points of the surface - they are
+        # slightly inside the hole.
+        #
+        # This equation is equivalent to the first equation on page 3 from
         # https://www.heldermann-verlag.de/jgg/jgg15/j15h1mone.pdf
-        self.loxodromic_angle = (
-            math.atan(self.minor_radius /
-                      math.sqrt(self.major_radius * self.major_radius -
-                                self.minor_radius * self.minor_radius)))
+        self.loxodromic_angle = math.asin(self.minor_radius /
+                                          self.major_radius)
 
         self.slot_width = calculations.slot_width(self.material_thickness,
                                                   self.loxodromic_angle * 2)
